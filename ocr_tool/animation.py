@@ -4,11 +4,13 @@
 # import os
 # import ctypes
 # from ctypes import windll, wintypes, byref, c_ubyte
+# import traceback
 
 # # --- CONFIGURATION ---
 # FPS = 60
 # COLOR_CORE = (255, 255, 255)  # White
 # COLOR_GLOW = (40, 200, 255)   # Cyan
+# COLOR_BACKGROUND = (0, 0, 0, 0) # Fully transparent
 
 # # --- WINDOWS API ---
 # GWL_EXSTYLE = -20
@@ -140,58 +142,78 @@
 #     return surf
 
 # def main():
-#     pygame.init()
-    
-#     info = pygame.display.Info()
-#     w, h = info.current_w, info.current_h
-    
-#     os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
-    
-#     # [CRITICAL] Create Surface with SRCALPHA. 
-#     # NOFRAME is standard, but we rely on Windows API for the actual transparency layer.
-#     screen = pygame.display.set_mode((w, h), pygame.NOFRAME | pygame.SRCALPHA)
-    
-#     hwnd = pygame.display.get_wm_info()["window"]
-#     set_layered_style(hwnd)
-    
-#     # Assets
-#     BASE_W = w + 200
-#     BASE_H = 400
-#     glow_surf = create_gradient_surface(BASE_W, BASE_H)
-    
-#     clock = pygame.time.Clock()
-#     start_time = time.time()
-    
-#     running = True
-#     while running:
-#         for event in pygame.event.get():
-#             if event.type == pygame.QUIT:
-#                 running = False
+#     print("Starting animation script...")
+#     try:
+#         pygame.init()
+#         print("Pygame initialized.")
         
-#         # 1. Clear Screen with Transparent Color (0,0,0,0)
-#         # This prevents the "Black Screen" effect
-#         screen.fill((0, 0, 0, 0))
+#         info = pygame.display.Info()
+#         w, h = info.current_w, info.current_h
         
-#         # 2. Animation
-#         t = time.time() - start_time
-#         pulse = 1.0 + math.sin(t * 2.0) * 0.05
+#         os.environ['SDL_VIDEO_WINDOW_POS'] = "0,0"
         
-#         cur_w = int(BASE_W * pulse)
-#         cur_h = int(BASE_H * pulse)
+#         # [CRITICAL] Create Surface with SRCALPHA. 
+#         # NOFRAME is standard, but we rely on Windows API for the actual transparency layer.
+#         screen = pygame.display.set_mode((w, h), pygame.NOFRAME | pygame.SRCALPHA)
+#         print(f"Display mode set: {w}x{h}")
         
-#         scaled_glow = pygame.transform.smoothscale(glow_surf, (cur_w, cur_h))
+#         hwnd = pygame.display.get_wm_info()["window"]
+#         set_layered_style(hwnd)
+#         print(f"Layered style set: {hwnd}")
         
-#         x = (w // 2) - (cur_w // 2)
-#         y = h - cur_h + 120
+#         # Assets
+#         BASE_W = w + 200
+#         BASE_H = 400
+#         glow_surf = create_gradient_surface(BASE_W, BASE_H)
+#         print("Gradient surface created.")
         
-#         screen.blit(scaled_glow, (x, y))
+#         clock = pygame.time.Clock()
+#         start_time = time.time()
         
-#         # 3. Send to Windows
-#         update_window_per_pixel(hwnd, screen)
+#         print("Entering main loop...")
+#         running = True
+#         while running:
+#             try:
+#                 for event in pygame.event.get():
+#                     if event.type == pygame.QUIT:
+#                         running = False
+                
+#                 # 1. Clear Screen with Transparent Color
+#                 # We use COLOR_BACKGROUND to create the shaded overlay effect
+#                 screen.fill(COLOR_BACKGROUND)
+                
+#                 # 2. Animation
+#                 t = time.time() - start_time
+#                 pulse = 1.0 + math.sin(t * 2.0) * 0.05
+                
+#                 cur_w = int(BASE_W * pulse)
+#                 cur_h = int(BASE_H * pulse)
+                
+#                 scaled_glow = pygame.transform.smoothscale(glow_surf, (cur_w, cur_h))
+                
+#                 x = (w // 2) - (cur_w // 2)
+#                 y = h - cur_h + 120
+                
+#                 screen.blit(scaled_glow, (x, y))
+                
+#                 # 3. Send to Windows
+#                 update_window_per_pixel(hwnd, screen)
+                
+#                 clock.tick(FPS)
+#             except Exception as e:
+#                  print(f"Error in loop: {e}")
+#                  traceback.print_exc()
+#                  running = False
         
-#         clock.tick(FPS)
-        
-#     pygame.quit()
+#         print("Loop finished.")
+#         pygame.quit()
+#     except Exception as e:
+#         print(f"CRITICAL ERROR in main: {e}")
+#         traceback.print_exc()
 
 # if __name__ == "__main__":
-#     main()
+#     try:
+#         main()
+#     except Exception as e:
+#         print(f"CRITICAL ERROR top-level: {e}")
+#         traceback.print_exc()
