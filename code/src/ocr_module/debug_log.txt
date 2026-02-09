@@ -1,0 +1,6 @@
+--- Animation Session Started ---
+[13:44:57] Pygame Initialized
+[13:44:57] Transparency applied successfully.
+[13:44:57] Looking for images in: d:\Academic\2yp\AI-Smart-Assistant\ocr_tool\anim
+[13:45:00] SUCCESS: Loaded 301 frames.
+[13:45:00] Entering main loop...

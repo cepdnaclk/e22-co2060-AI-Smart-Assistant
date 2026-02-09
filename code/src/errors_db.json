@@ -33,5 +33,9 @@
     "s d academic al smart assistant cd": {
         "category": "AI-generated",
         "solution": " ERROR SUMMARY:\nThe command 'cd' is not an error, but a command used to change the current directory in a Command Prompt or Terminal window.\n\nPOSSIBLE CAUSES:\n- The user may have mistyped the directory name or path.\n- The specified directory might not exist.\n\nSTEP-BY-STEP FIX:\n1. Verify that the directory you want to change to exists in your current working directory. You can list all directories using the 'ls' command (on Linux) or 'dir' command (on Windows).\n2. If the directory is missing, navigate to its parent directory and then change to it using the 'cd' command. For example:\n   - On Windows:\n     ```\n     cd ..\\ParentDirectoryName\n     cd ChildDirectoryName\n     ```\n   - On Linux/macOS:\n     ```\n     cd ../ParentDirectoryName\n     cd ChildDirectoryName\n     ```\n\nWARNINGS (if any):\n- Be sure to double-check the spelling of directory names and paths.\n- The 'cd' command is case-sensitive on some systems, so make sure you're"
+    },
+    "hotkey triggered": {
+        "category": "AI-generated",
+        "solution": null
     }
 }
