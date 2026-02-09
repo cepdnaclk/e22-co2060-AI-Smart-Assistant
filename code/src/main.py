@@ -259,6 +259,7 @@ def start_tray_icon():
 # Main Loop
 # --------------------------
 def main():
+    global is_processing
     setup_hotkey()
     print("Background OCR Service Running...")
     print("Press Ctrl+Alt+Shift+O to capture.")
