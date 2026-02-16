@@ -1,4 +1,5 @@
 {
+    "title": "AI Smart Assistant",
     "team": [
         {
             "name": "K.D.N.Chandrasena",
@@ -17,8 +18,8 @@
         },
         {
             "name": "K.A.H.Kumarasinghe",
-            "email": "e22278@eng.pdn.ac.lk",
-            "eNumber": "E/22/2058"
+            "email": "e22205@eng.pdn.ac.lk",
+            "eNumber": "E/22/205"
         }
     ],
     "supervisors": [
