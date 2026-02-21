@@ -9,6 +9,8 @@ import re
 import difflib
 import ctypes
 import multiprocessing
+from src.ai_module.rag import rag_query, build_faiss_index, cache_suggestion
+
 
 from src.ocr_module.overlay import RegionSelection
 from src.ocr_module.engine import OCREngine
@@ -115,14 +117,8 @@ def run_capture_logic():
     try:
         region_selector = RegionSelection()
         selection = region_selector.get_region()
-
         if not selection:
             print("Selection cancelled.")
-            return
-
-        print(f"Region selected: {selection}")
-        if not ocr:
-            print("OCR engine not initialized.")
             return
 
         text = ocr.capture_and_extract(selection)
@@ -133,39 +129,21 @@ def run_capture_logic():
         print(f"Extracted Text: {text}")
         copy_to_clipboard(text)
 
-        # Send to chat UI
         if chat_queue:
             chat_queue.put(text)
 
-        # Check local DB
-        solution = find_error_solution(text)
-        if solution:
-            print(f"[LOCAL DB MATCH] Category: {solution['category']}")
-            print(f"Suggested Fix: {solution['solution']}")
-        else:
-            print("[LOCAL DB] No match found. Using AI fallback...")
-            ai_client = MistralClient()
-            ai_response = ai_client.generate(
-                f"You are a troubleshooting assistant. "
-                f"Explain the following error and provide step-by-step fix: {text}"
-            )
-            suggestion = ai_response.get("response") or ai_response.get("text")
-            print(f"[AI SUGGESTION] {suggestion}")
+        # --- RAG Retrieval ---
+        suggestion = rag_query(text)
+        print(f"[RAG SUGGESTION] {suggestion}")
 
-            # Cache AI suggestion
-            try:
-                db = load_db()
-                db[normalize_text(text)] = {"category": "AI-generated", "solution": suggestion}
-                with open(DB_FILE, "w", encoding="utf-8") as f:
-                    json.dump(db, f, indent=4, ensure_ascii=False)
-                print("[CACHE] AI suggestion saved.")
-            except Exception as e:
-                print(f"[CACHE ERROR] {e}")
+        # Cache suggestion
+        cache_suggestion(text, suggestion)
 
     except Exception as e:
         print(f"Error in capture logic: {e}")
     finally:
         is_processing = False
+
 
 # -------------------------- Hotkeys & Tray --------------------------
 def setup_hotkey():
@@ -188,14 +166,14 @@ def main():
     print("Background OCR Service Running...")
     print("Capture: Ctrl+Alt+Shift+O | Exit: Ctrl+Alt+Shift+P")
 
-    # Start chat UI process
+    # --- NEW: Build FAISS index from JSON DB ---
+    build_faiss_index()
+
     chat_queue, chat_process = chat_ui.start_chat_process()
 
-    # Start tray icon thread
     tray_thread = threading.Thread(target=start_tray_icon, daemon=True)
     tray_thread.start()
 
-    # Main loop
     while running:
         if capture_event.is_set():
             capture_event.clear()
@@ -206,6 +184,8 @@ def main():
     if chat_process.is_alive():
         chat_process.terminate()
     os._exit(0)
+
+
 
 if __name__ == "__main__":
     main()
