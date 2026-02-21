@@ -5,3 +5,8 @@ pyserial
 keyboard
 pyperclip
 tk
+langchain
+llama-index
+sentence-transformers
+transformers
+faiss-cpu
