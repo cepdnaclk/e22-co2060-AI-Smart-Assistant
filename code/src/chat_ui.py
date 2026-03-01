@@ -1,94 +1,141 @@
 import tkinter as tk
 import multiprocessing
 import queue
-
-def round_rectangle(canvas, x1, y1, x2, y2, radius=30, **kwargs):
-    points = [x1+radius, y1, x2-radius, y1, x2, y1+radius, x2, y2-radius, x2-radius, y2, x1+radius, y2, x1, y2-radius, x1, y1+radius]
-    return canvas.create_polygon(points, **kwargs, smooth=True)
+import datetime
 
 def _launch_chat_window(msg_queue):
-    BG_COLOR = "#050010"
-    ACCENT_COLOR = "#28C8FF"
-    INPUT_BG = "#151020"
-    TEXT_COLOR = "#E0E0E0"
+    # --- Theme Configuration ---
+    BG_COLOR = "#1E1E2E"      
+    ACCENT_COLOR = "#89B4FA"  
+    INPUT_BG = "#313244"      
+    USER_BUBBLE_BG = "#45475A"
+    SYSTEM_BUBBLE_BG = "#313244"
+    TEXT_COLOR = "#CDD6F4"
+    TIME_COLOR = "#585B70" # Subtle color for the clock
+    
+    WINDOW_RADIUS = 20  
+    BUBBLE_RADIUS = 15 
 
     root = tk.Tk()
-    root.title("AI Assistant")
-    root.overrideredirect(True)
-    root.configure(bg="#000001")
+    root.overrideredirect(True) 
+    root.attributes("-topmost", True)
+    root.config(bg="#000001")
     root.attributes("-transparentcolor", "#000001")
-    root.attributes("-alpha", 0.7)
 
-    w, h = 400, 1000
-    sw = root.winfo_screenwidth()
+    # Geometry logic
     sh = root.winfo_screenheight()
-    root.geometry(f"{w}x{h}+{sw-w-20}+{sh-h-50}")
+    h = sh - 100
+    w = 400
+    sw = root.winfo_screenwidth()
+    root.geometry(f"{w}x{h}+{sw - w - 20}+{sh - h - 60}")
     root.withdraw()
 
-    canvas = tk.Canvas(root, bg="#000001", highlightthickness=0)
-    canvas.pack(fill="both", expand=True)
-    round_rectangle(canvas, 2, 2, w-2, h-2, radius=30, fill=BG_COLOR, outline=ACCENT_COLOR, width=1)
+    def draw_rounded_rect(canvas, x1, y1, x2, y2, radius, **kwargs):
+        points = [x1+radius, y1, x1+radius, y1, x2-radius, y1, x2-radius, y1, x2, y1, x2, y1+radius, x2, y1+radius, x2, y2-radius, x2, y2-radius, x2, y2, x2-radius, y2, x2-radius, y2, x1+radius, y2, x1+radius, y2, x1, y2, x1, y2-radius, x1, y2-radius, x1, y1+radius, x1, y1+radius, x1, y1]
+        return canvas.create_polygon(points, **kwargs, smooth=True)
 
-    content_frame = tk.Frame(root, bg=BG_COLOR)
-    content_frame.place(x=20, y=20, width=w-40, height=h-40)
+    # Main Window Canvas
+    main_canvas = tk.Canvas(root, width=w, height=h, bg="#000001", highlightthickness=0)
+    main_canvas.pack()
+    draw_rounded_rect(main_canvas, 2, 2, w-2, h-2, WINDOW_RADIUS, fill=BG_COLOR, outline=ACCENT_COLOR, width=2)
 
+    content_frame = tk.Frame(root, bg=BG_COLOR, bd=0)
+    content_frame.place(x=15, y=15, width=w-30, height=h-30)
+
+    # --- Header ---
     header = tk.Frame(content_frame, bg=BG_COLOR)
-    header.pack(side=tk.TOP, fill=tk.X, pady=(0, 5))
-    tk.Label(header, text="AI CHAT", bg=BG_COLOR, fg=ACCENT_COLOR, font=("Segoe UI", 10, "bold")).pack(side=tk.LEFT)
-    tk.Button(header, text="✕", command=lambda: root.withdraw(), bg=BG_COLOR, fg="#666", bd=0).pack(side=tk.RIGHT)
+    header.pack(side=tk.TOP, fill=tk.X, pady=(0, 10))
+    tk.Label(header, text="AI ASSISTANT", bg=BG_COLOR, fg=ACCENT_COLOR, font=("Segoe UI Semibold", 10)).pack(side=tk.LEFT)
+    tk.Button(header, text="✕", command=root.withdraw, bg=BG_COLOR, fg="#F38BA8", bd=0, font=("Arial", 11)).pack(side=tk.RIGHT, padx=2)
 
-    input_container = tk.Frame(content_frame, bg=BG_COLOR)
-    input_container.pack(side=tk.BOTTOM, fill=tk.X, pady=(10,5))
-    tk.Label(input_container, text="TYPE MESSAGE:", bg=BG_COLOR, fg="#666", font=("Segoe UI",7,"bold")).pack(anchor="w", padx=5)
+    # --- Scrollable Chat Area ---
+    chat_canvas = tk.Canvas(content_frame, bg=BG_COLOR, highlightthickness=0)
+    chat_canvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    
+    bubble_frame = tk.Frame(chat_canvas, bg=BG_COLOR)
+    chat_canvas.create_window((0, 0), window=bubble_frame, anchor="nw", width=w-40)
 
-    input_height = 50
-    input_canvas = tk.Canvas(input_container, bg=BG_COLOR, height=input_height, highlightthickness=0)
-    input_canvas.pack(fill=tk.X, pady=(2,0))
-    box_width = w - 50
-    round_rectangle(input_canvas, 2, 2, box_width, input_height-2, radius=20, fill=INPUT_BG, outline=ACCENT_COLOR)
+    def on_configure(event):
+        chat_canvas.configure(scrollregion=chat_canvas.bbox("all"))
+    bubble_frame.bind("<Configure>", on_configure)
 
-    send_btn = tk.Button(input_canvas, text="➤", bg=INPUT_BG, fg=ACCENT_COLOR, bd=0)
-    send_btn.place(x=box_width-45, y=5, width=40, height=40)
-    input_box = tk.Text(input_canvas, height=2, bg=INPUT_BG, fg="white")
-    input_box.place(x=15, y=10, width=box_width-60, height=input_height-20)
-
-    history_box = tk.Text(content_frame, bg=BG_COLOR, fg=TEXT_COLOR, bd=0, state="disabled", wrap=tk.WORD)
-    history_box.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
-    history_box.tag_config("user_msg", justify='right', foreground="white", rmargin=5)
-    history_box.tag_config("system_msg", justify='left', foreground=ACCENT_COLOR, lmargin1=5)
-    history_box.tag_config("timestamp", foreground="#666666", font=("Consolas",8), justify='center')
-
+    # --- Bubble Logic with Timestamps ---
     def add_message(text, sender="system"):
-        import datetime
-        ts = datetime.datetime.now().strftime("%H:%M")
-        history_box.config(state="normal")
-        history_box.insert(tk.END, f"\n{ts}\n", "timestamp")
-        tag = "user_msg" if sender=="user" else "system_msg"
-        history_box.insert(tk.END, f"{text}\n", tag)
-        history_box.see(tk.END)
-        history_box.config(state="disabled")
+        # Container for the row
+        row_frame = tk.Frame(bubble_frame, bg=BG_COLOR, pady=10)
+        row_frame.pack(fill=tk.X, expand=True)
 
-    def send_user_message(event=None):
-        text = input_box.get("1.0", tk.END).strip()
-        if text:
-            add_message(text, sender="user")
+        # Time string
+        current_time = datetime.datetime.now().strftime("%I:%M %p")
+        
+        # Dynamic sizing logic
+        lines = (len(text) // 32) + 1
+        bubble_h = (lines * 22) + 20
+        bubble_w = 260
+        bg_color = USER_BUBBLE_BG if sender == "user" else SYSTEM_BUBBLE_BG
+        align = tk.RIGHT if sender == "user" else tk.LEFT
+        
+        # 1. Create Time Label
+        time_lbl = tk.Label(row_frame, text=current_time, font=("Segoe UI", 7), fg=TIME_COLOR, bg=BG_COLOR)
+        
+        # 2. Create Bubble Canvas
+        b_canvas = tk.Canvas(row_frame, width=bubble_w, height=bubble_h, bg=BG_COLOR, highlightthickness=0)
+        
+        if sender == "user":
+            b_canvas.pack(side=tk.RIGHT, padx=(5, 10))
+            time_lbl.pack(side=tk.RIGHT, anchor="s", padx=2) # Time on left of user bubble
+        else:
+            b_canvas.pack(side=tk.LEFT, padx=(10, 5))
+            time_lbl.pack(side=tk.LEFT, anchor="s", padx=2) # Time on right of system bubble
+
+        # Draw bubble shape
+        draw_rounded_rect(b_canvas, 2, 2, bubble_w-2, bubble_h-2, BUBBLE_RADIUS, fill=bg_color)
+        
+        # Add Text
+        lbl = tk.Label(b_canvas, text=text, bg=bg_color, fg="white", wraplength=bubble_w-30, justify=tk.LEFT, font=("Segoe UI", 10))
+        b_canvas.create_window(bubble_w//2, bubble_h//2, window=lbl)
+
+        # Auto-scroll
+        root.update_idletasks()
+        chat_canvas.yview_moveto(1.0)
+
+    # --- Input Section (Maintains existing radius) ---
+    input_canvas_height = 60
+    input_container = tk.Canvas(content_frame, height=input_canvas_height, bg=BG_COLOR, highlightthickness=0)
+    input_container.pack(side=tk.BOTTOM, fill=tk.X, pady=(10, 0))
+    draw_rounded_rect(input_container, 2, 2, w-32, input_canvas_height-2, 15, fill=INPUT_BG)
+
+    input_box = tk.Text(input_container, bg=INPUT_BG, fg="white", bd=0, font=("Segoe UI", 10), insertbackground="white")
+    
+    def send_action(event=None):
+        content = input_box.get("1.0", tk.END).strip()
+        if content:
+            add_message(content, sender="user")
             input_box.delete("1.0", tk.END)
         return "break"
 
-    input_box.bind("<Return>", send_user_message)
-    send_btn.config(command=send_user_message)
+    send_btn = tk.Button(input_container, text="➤", command=send_action, bg=INPUT_BG, fg=ACCENT_COLOR, bd=0, font=("Segoe UI", 14), cursor="hand2")
+    input_container.create_window((w-85)//2, input_canvas_height//2, window=input_box, width=w-110, height=input_canvas_height-20)
+    input_container.create_window(w-60, input_canvas_height//2, window=send_btn)
+    input_box.bind("<Return>", send_action)
 
     def check_queue():
         try:
             while True:
-                text = msg_queue.get_nowait()
-                if text:
-                    root.deiconify()
+                msg_data = msg_queue.get_nowait()
+                if msg_data:
+                    # Check if data is a dict (sender + text) or just a string
+                    if isinstance(msg_data, dict):
+                        sender = msg_data.get("sender", "system")
+                        message = msg_data.get("text", "")
+                    else:
+                        sender = "system"
+                        message = msg_data
+
+                    root.deiconify() # Bring window to front
                     root.attributes("-topmost", True)
-                    add_message(f"Captured:\n{text}", sender="system")
-                    root.lift()
+                    add_message(message, sender=sender) # Use your new bubble logic
                     input_box.focus_set()
-                    root.after(1000, lambda: root.attributes("-topmost", False))
         except queue.Empty:
             pass
         root.after(100, check_queue)

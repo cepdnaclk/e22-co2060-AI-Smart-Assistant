@@ -162,6 +162,11 @@ def run_capture_logic():
             except Exception as e:
                 print(f"[CACHE ERROR] {e}")
 
+        # 2. Send the AI Suggestion to the UI as 'system'
+        if chat_queue:
+            chat_queue.put({"sender": "system", "text": suggestion})
+        
+        
     except Exception as e:
         print(f"Error in capture logic: {e}")
     finally:
