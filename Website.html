@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html class="light scroll-smooth" lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>AI Smart Assistant - Final Year Project</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+    rel="stylesheet" />
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#135bec",
+            "background-light": "#f8fafc",
+            "glass-border": "rgba(0, 0, 0, 0.08)",
+            "glass-bg": "rgba(255, 255, 255, 0.7)",
+            "text-dark": "#1e293b",
+            "text-muted": "#64748b"
+          },
+          fontFamily: {
+            "display": ["Space Grotesk", "sans-serif"]
+          },
+          borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+          backgroundImage: {
+            'subtle-gradient': 'radial-gradient(circle at 50% 0%, rgba(19, 91, 236, 0.08), transparent 60%)'
+          },
+          boxShadow: {
+            'glass': '0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03)',
+            'glass-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04)'
+          }
+        },
+      },
+    }
+  </script>
+</head>
+
+<body
+  class="bg-background-light dark:bg-slate-900 text-text-dark dark:text-slate-100 dark:text-slate-200 font-display antialiased selection:bg-primary selection:text-white overflow-x-hidden transition-colors duration-300">
+  <header
+    class="fixed top-0 left-0 right-0 z-50 border-b border-glass-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-800/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors duration-300">
+    <div class="max-w-[1280px] mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined">smart_toy</span>
+        </div>
+        <h1 class="text-text-dark dark:text-slate-100 text-lg font-bold tracking-tight">AI Smart Assistant</h1>
+      </div>
+      <nav class="hidden lg:flex items-center gap-6">
+        <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors" href="#home">Home</a>
+        <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors" href="#about">About</a>
+        <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
+          href="#features">Features</a>
+        <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
+          href="#architecture">Architecture</a>
+        <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors" href="#tech">Tech Stack</a>
+        <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors" href="#demo">Demo</a>
+        <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors" href="#team">Team</a>
+      </nav>
+      <div class="flex items-center gap-4">
+        <button id="theme-toggle"
+          class="text-text-muted hover:text-text-dark dark:text-slate-100 transition-colors flex items-center justify-center size-8 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800"
+          title="Toggle Dark Mode">
+          <span class="material-symbols-outlined dark:hidden">dark_mode</span>
+          <span class="material-symbols-outlined hidden dark:block">light_mode</span>
+        </button>
+        <a class="text-text-muted hover:text-text-dark dark:text-slate-100 transition-colors" href="https://github.com" target="_blank">
+          <span class="material-symbols-outlined">code</span>
+        </a>
+      </div>
+    </div>
+  </header>
+  <section class="relative pt-32 pb-20 px-6 overflow-hidden" id="home">
+    <div class="absolute top-0 left-0 w-full h-[600px] bg-subtle-gradient pointer-events-none"></div>
+    <div class="max-w-[1280px] mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
+      <div class="flex flex-col gap-6">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-primary/20 bg-primary/5 w-fit">
+          <span class="size-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="text-xs font-semibold text-primary uppercase tracking-wide">Final Year Project 2026</span>
+        </div>
+        <h2 class="text-5xl md:text-6xl font-bold leading-[1.1] text-text-dark dark:text-slate-100 tracking-tight">
+          Intelligent <span class="text-primary">Screen-Aware</span> Automation
+        </h2>
+        <p class="text-lg text-text-muted max-w-xl leading-relaxed">
+          Bridging the gap between visual context and execution. An autonomous assistant powered by OCR and Large
+          Language Models to perceive, understand, and act upon your screen.
+        </p>
+        <div class="flex items-center gap-4 pt-4">
+          <a class="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-lg font-semibold transition-all flex items-center gap-2 shadow-lg shadow-primary/20"
+            href="#demo">
+            <span class="material-symbols-outlined text-xl">play_circle</span>
+            View Demo
+          </a>
+          <a class="border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:bg-slate-800/50 text-text-muted px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 shadow-sm"
+            href="#docs">
+            <span class="material-symbols-outlined text-xl">description</span>
+            Documentation
+          </a>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-xl blur opacity-10"></div>
+        <div
+          class="relative rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800/80 backdrop-blur-sm overflow-hidden aspect-video shadow-glass"
+          data-alt="Dashboard interface of the AI assistant overlay on a desktop background showing code and terminal">
+          <div class="absolute inset-0 flex items-center justify-center bg-slate-50 dark:bg-slate-800/50">
+            <div class="text-center">
+              <span class="material-symbols-outlined text-6xl text-slate-300 mb-4">screenshot_monitor</span>
+              <p class="text-text-muted font-medium">System Interface Preview</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section
+    class="py-20 px-6 border-t border-glass-border dark:border-slate-700 dark:border-slate-800 bg-background-light dark:bg-slate-900 transition-colors duration-300 relative"
+    id="about">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="mb-12">
+        <h3 class="text-2xl font-bold text-text-dark dark:text-slate-100 mb-2">Project Overview</h3>
+        <p class="text-text-muted">Addressing limitations in traditional robotic process automation.</p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-8">
+        <div
+          class="group p-8 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-red-500/30 transition-colors relative overflow-hidden shadow-glass hover:shadow-glass-hover">
+          <div class="absolute top-0 right-0 p-32 bg-red-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none">
+          </div>
+          <div class="flex items-start gap-4 relative z-10">
+            <div class="p-3 rounded-lg bg-red-50 text-red-500">
+              <span class="material-symbols-outlined">warning</span>
+            </div>
+            <div>
+              <h4 class="text-xl font-bold text-text-dark dark:text-slate-100 mb-3">The Problem</h4>
+              <p class="text-text-muted leading-relaxed text-sm">
+                Traditional automation tools rely on rigid selectors or coordinate-based scripting. They lack "vision"
+                and cannot understand dynamic UI changes, requiring constant maintenance and breaking easily with minor
+                UI updates.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div
+          class="group p-8 rounded-xl border border-glass-border dark:border-slate-700 dark:border-slate-700 bg-white dark:bg-slate-800 dark:bg-slate-800 hover:border-green-500/30 dark:hover:border-green-500/50 transition-colors relative overflow-hidden shadow-glass hover:shadow-glass-hover">
+          <div
+            class="absolute top-0 right-0 p-32 bg-green-500/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none">
+          </div>
+          <div class="flex items-start gap-4 relative z-10">
+            <div class="p-3 rounded-lg bg-green-50 text-green-600">
+              <span class="material-symbols-outlined">check_circle</span>
+            </div>
+            <div>
+              <h4 class="text-xl font-bold text-text-dark dark:text-slate-100 mb-3">The Solution</h4>
+              <p class="text-text-muted leading-relaxed text-sm">
+                A semantic understanding layer combining OCR for text extraction and LLMs for reasoning. The system
+                "sees" the screen like a human, interpreting intent and executing actions through simulated input events
+                dynamically.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="py-20 px-6 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-800/50 transition-colors duration-300" id="features">
+    <div class="max-w-[1280px] mx-auto">
+      <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+        <div>
+          <h3 class="text-3xl font-bold text-text-dark dark:text-slate-100 mb-2">Core Capabilities</h3>
+          <p class="text-text-muted max-w-lg">Technical features enabling intelligent automation.</p>
+        </div>
+        <div class="flex gap-2">
+          <span
+            class="px-3 py-1 text-xs font-mono rounded bg-primary/10 text-primary border border-primary/20">v1.0.0-beta</span>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div
+          class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col gap-4 group hover:shadow-glass-hover transition-all shadow-glass">
+          <div
+            class="size-12 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-2xl">visibility</span>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-text-dark dark:text-slate-100 mb-2">Visual Perception</h4>
+            <p class="text-sm text-text-muted">Real-time screen capture and OCR processing to convert pixels into
+              structured text data.</p>
+          </div>
+        </div>
+        <div
+          class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col gap-4 group hover:shadow-glass-hover transition-all shadow-glass">
+          <div
+            class="size-12 rounded-lg bg-purple-50 text-purple-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-2xl">psychology</span>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-text-dark dark:text-slate-100 mb-2">Cognitive Engine</h4>
+            <p class="text-sm text-text-muted">Powered by local LLMs (Llama 3 / Mistral) to interpret user commands and
+              map them to screen coordinates.</p>
+          </div>
+        </div>
+        <div
+          class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col gap-4 group hover:shadow-glass-hover transition-all shadow-glass">
+          <div
+            class="size-12 rounded-lg bg-cyan-50 text-cyan-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-2xl">mouse</span>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-text-dark dark:text-slate-100 mb-2">Action Execution</h4>
+            <p class="text-sm text-text-muted">Low-level OS integration to simulate mouse movements, clicks, and
+              keystrokes naturally.</p>
+          </div>
+        </div>
+        <div
+          class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col gap-4 group hover:shadow-glass-hover transition-all shadow-glass">
+          <div
+            class="size-12 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-2xl">layers</span>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-text-dark dark:text-slate-100 mb-2">Overlay Interface</h4>
+            <p class="text-sm text-text-muted">Non-intrusive overlay UI allowing users to interact with the assistant
+              without leaving their workflow.</p>
+          </div>
+        </div>
+        <div
+          class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col gap-4 group hover:shadow-glass-hover transition-all shadow-glass">
+          <div
+            class="size-12 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-2xl">security</span>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-text-dark dark:text-slate-100 mb-2">Privacy First</h4>
+            <p class="text-sm text-text-muted">Local processing ensures sensitive screen data never leaves the user's
+              machine.</p>
+          </div>
+        </div>
+        <div
+          class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 flex flex-col gap-4 group hover:shadow-glass-hover transition-all shadow-glass">
+          <div
+            class="size-12 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-2xl">extension</span>
+          </div>
+          <div>
+            <h4 class="text-lg font-bold text-text-dark dark:text-slate-100 mb-2">Plugin Architecture</h4>
+            <p class="text-sm text-text-muted">Modular design allowing for custom skill definitions and extended
+              capabilities.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section
+    class="py-20 px-6 bg-background-light dark:bg-slate-900 border-t border-glass-border dark:border-slate-700 dark:border-slate-800 transition-colors duration-300"
+    id="architecture">
+    <div class="max-w-[1280px] mx-auto">
+      <h3 class="text-3xl font-bold text-text-dark dark:text-slate-100 mb-8">System Architecture</h3>
+      <div class="grid lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-1 flex flex-col justify-center gap-6">
+          <div class="pl-4 border-l-2 border-primary">
+            <h4 class="text-text-dark dark:text-slate-100 font-bold mb-1">1. Input Acquisition</h4>
+            <p class="text-text-muted text-sm">Captures active window state and user voice/text commands.</p>
+          </div>
+          <div class="pl-4 border-l-2 border-slate-200">
+            <h4 class="text-text-dark dark:text-slate-100 font-bold mb-1">2. Semantic Analysis</h4>
+            <p class="text-text-muted text-sm">Tesseract OCR extracts text; LLM creates a structured representation of
+              the UI.</p>
+          </div>
+          <div class="pl-4 border-l-2 border-slate-200">
+            <h4 class="text-text-dark dark:text-slate-100 font-bold mb-1">3. Planning</h4>
+            <p class="text-text-muted text-sm">The reasoning engine decomposes the goal into a sequence of atomic
+              actions.</p>
+          </div>
+          <div class="pl-4 border-l-2 border-slate-200">
+            <h4 class="text-text-dark dark:text-slate-100 font-bold mb-1">4. Execution</h4>
+            <p class="text-text-muted text-sm">PyAutoGUI triggers OS-level events to manipulate the interface.</p>
+          </div>
+        </div>
+        <div class="lg:col-span-2 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 p-2 md:p-8 shadow-glass"
+          data-alt="Technical flowchart diagram showing the data flow from Screen Capture to OCR, then to LLM Context Processor, Action Planner, and finally Execution Module">
+          <div
+            class="w-full h-full min-h-[300px] bg-slate-50 dark:bg-slate-800/50 rounded flex flex-col items-center justify-center p-8 border border-dashed border-slate-200">
+            <span class="material-symbols-outlined text-5xl text-slate-300 mb-4">schema</span>
+            <p class="text-text-muted font-mono text-sm text-center">System Flow Diagram Placeholder<br />(Input -&gt;
+              OCR -&gt; LLM -&gt; Action)</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="py-20 px-6 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-800/50 transition-colors duration-300" id="tech">
+    <div class="max-w-[1280px] mx-auto">
+      <h3 class="text-2xl font-bold text-text-dark dark:text-slate-100 mb-8 text-center">Technology Stack</h3>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div
+          class="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:border-primary/50 transition-colors">
+          <span class="material-symbols-outlined text-4xl text-[#FFD43B]">terminal</span>
+          <span class="text-text-dark dark:text-slate-100 font-medium">Python</span>
+        </div>
+        <div
+          class="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:border-primary/50 transition-colors">
+          <span class="material-symbols-outlined text-4xl text-slate-700">memory</span>
+          <span class="text-text-dark dark:text-slate-100 font-medium">Ollama</span>
+        </div>
+        <div
+          class="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:border-primary/50 transition-colors">
+          <span class="material-symbols-outlined text-4xl text-blue-600">find_in_page</span>
+          <span class="text-text-dark dark:text-slate-100 font-medium">Tesseract OCR</span>
+        </div>
+        <div
+          class="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:border-primary/50 transition-colors">
+          <span class="material-symbols-outlined text-4xl text-green-600">api</span>
+          <span class="text-text-dark dark:text-slate-100 font-medium">FastAPI</span>
+        </div>
+        <div
+          class="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:border-primary/50 transition-colors">
+          <span class="material-symbols-outlined text-4xl text-purple-600">layers</span>
+          <span class="text-text-dark dark:text-slate-100 font-medium">PyTorch</span>
+        </div>
+        <div
+          class="flex flex-col items-center justify-center gap-3 p-6 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm hover:border-primary/50 transition-colors">
+          <span class="material-symbols-outlined text-4xl text-slate-500">settings_applications</span>
+          <span class="text-text-dark dark:text-slate-100 font-medium">Win32 API</span>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section
+    class="py-20 px-6 border-t border-glass-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-800 dark:bg-slate-900 transition-colors duration-300"
+    id="demo">
+    <div class="max-w-[1280px] mx-auto grid lg:grid-cols-2 gap-16">
+      <div>
+        <h3 class="text-3xl font-bold text-text-dark dark:text-slate-100 mb-6">Demonstration</h3>
+        <div
+          class="rounded-xl border border-glass-border dark:border-slate-700 bg-slate-900 overflow-hidden aspect-video relative group cursor-pointer shadow-lg"
+          data-alt="Video player placeholder showing the automation assistant filling out a web form automatically">
+          <div class="absolute inset-0 flex items-center justify-center">
+            <div
+              class="size-16 rounded-full bg-white dark:bg-slate-800/20 backdrop-blur-sm flex items-center justify-center group-hover:scale-110 transition-transform border border-white/30">
+              <span class="material-symbols-outlined text-white text-3xl">play_arrow</span>
+            </div>
+          </div>
+          <div class="absolute bottom-4 left-4 right-4 flex justify-between text-xs text-slate-300">
+            <span>Scenario: Automated Form Filling</span>
+            <span>02:14</span>
+          </div>
+        </div>
+        <div class="mt-6 flex gap-4 overflow-x-auto pb-4">
+          <div class="w-32 h-20 bg-slate-100 rounded border border-slate-200 shrink-0"
+            data-alt="Screenshot thumbnail 1"></div>
+          <div class="w-32 h-20 bg-slate-100 rounded border border-slate-200 shrink-0"
+            data-alt="Screenshot thumbnail 2"></div>
+          <div class="w-32 h-20 bg-slate-100 rounded border border-slate-200 shrink-0"
+            data-alt="Screenshot thumbnail 3"></div>
+        </div>
+      </div>
+      <div id="docs">
+        <h3 class="text-3xl font-bold text-text-dark dark:text-slate-100 mb-6">Project Documentation</h3>
+        <div class="flex flex-col gap-4">
+          <a class="flex items-center justify-between p-4 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:bg-slate-800/50 transition-all group shadow-sm hover:shadow-md"
+            href="#">
+            <div class="flex items-center gap-4">
+              <span class="material-symbols-outlined text-red-500 text-3xl">picture_as_pdf</span>
+              <div>
+                <h4 class="text-text-dark dark:text-slate-100 font-medium">Software Requirement Specification</h4>
+                <p class="text-xs text-text-muted">SRS_v2.4.pdf • 2.4 MB</p>
+              </div>
+            </div>
+            <span
+              class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors">download</span>
+          </a>
+          <a class="flex items-center justify-between p-4 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:bg-slate-800/50 transition-all group shadow-sm hover:shadow-md"
+            href="#">
+            <div class="flex items-center gap-4">
+              <span class="material-symbols-outlined text-blue-500 text-3xl">picture_as_pdf</span>
+              <div>
+                <h4 class="text-text-dark dark:text-slate-100 font-medium">System Design Document</h4>
+                <p class="text-xs text-text-muted">SDD_Final.pdf • 5.1 MB</p>
+              </div>
+            </div>
+            <span
+              class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors">download</span>
+          </a>
+          <a class="flex items-center justify-between p-4 rounded-lg border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:bg-slate-800/50 transition-all group shadow-sm hover:shadow-md"
+            href="#">
+            <div class="flex items-center gap-4">
+              <span class="material-symbols-outlined text-yellow-500 text-3xl">table_view</span>
+              <div>
+                <h4 class="text-text-dark dark:text-slate-100 font-medium">Work Breakdown Structure</h4>
+                <p class="text-xs text-text-muted">Project_WBS.xlsx • 120 KB</p>
+              </div>
+            </div>
+            <span
+              class="material-symbols-outlined text-slate-400 dark:text-slate-500 group-hover:text-primary transition-colors">download</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section
+    class="py-20 px-6 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-800/50 border-t border-glass-border dark:border-slate-700 dark:border-slate-800 transition-colors duration-300"
+    id="team">
+    <div class="max-w-[1280px] mx-auto">
+      <h3 class="text-3xl font-bold text-text-dark dark:text-slate-100 mb-10 text-center">Project Team</h3>
+
+      <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-16">
+        <!-- Danuja Nirodhana -->
+        <div
+          class="p-8 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-glass flex flex-col items-center text-center">
+          <div class="size-24 rounded-full bg-slate-100 mb-6 overflow-hidden border-2 border-primary/20"
+            data-alt="Portrait of Danuja Nirodhana">
+            <span
+              class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-500 w-full h-full flex items-center justify-center">person</span>
+          </div>
+          <h4 class="text-xl font-bold text-text-dark dark:text-slate-100">Danuja Nirodhana</h4>
+          <p class="text-primary text-sm font-medium mb-3">Lead Developer &amp; Architect</p>
+          <p class="text-sm text-text-muted mb-6">Responsible for LLM integration, backend architecture, and core logic
+            implementation.</p>
+          <div class="flex gap-3 mt-auto">
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition-colors border border-glass-border dark:border-slate-700"
+              title="LinkedIn">
+              <span class="material-symbols-outlined text-[20px]">work</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors border border-glass-border dark:border-slate-700"
+              title="Email">
+              <span class="material-symbols-outlined text-[20px]">mail</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 hover:text-text-dark dark:text-slate-100 transition-colors border border-glass-border dark:border-slate-700"
+              title="Website">
+              <span class="material-symbols-outlined text-[20px]">link</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Member 2 -->
+        <div
+          class="p-8 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-glass flex flex-col items-center text-center">
+          <div class="size-24 rounded-full bg-slate-100 mb-6 overflow-hidden border-2 border-purple-500/20"
+            data-alt="Portrait of Member 2">
+            <span
+              class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-500 w-full h-full flex items-center justify-center">person</span>
+          </div>
+          <h4 class="text-xl font-bold text-text-dark dark:text-slate-100">Member 2</h4>
+          <p class="text-purple-600 text-sm font-medium mb-3">UI/UX &amp; Frontend Engineer</p>
+          <p class="text-sm text-text-muted mb-6">Focused on overlay interface design, OCR optimization, and system
+            testing.</p>
+          <div class="flex gap-3 mt-auto">
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition-colors border border-glass-border dark:border-slate-700"
+              title="LinkedIn">
+              <span class="material-symbols-outlined text-[20px]">work</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors border border-glass-border dark:border-slate-700"
+              title="Email">
+              <span class="material-symbols-outlined text-[20px]">mail</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 hover:text-text-dark dark:text-slate-100 transition-colors border border-glass-border dark:border-slate-700"
+              title="Website">
+              <span class="material-symbols-outlined text-[20px]">link</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Member 3 -->
+        <div
+          class="p-8 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-glass flex flex-col items-center text-center">
+          <div class="size-24 rounded-full bg-slate-100 mb-6 overflow-hidden border-2 border-emerald-500/20"
+            data-alt="Portrait of Member 3">
+            <span
+              class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-500 w-full h-full flex items-center justify-center">person</span>
+          </div>
+          <h4 class="text-xl font-bold text-text-dark dark:text-slate-100">Member 3</h4>
+          <p class="text-emerald-600 text-sm font-medium mb-3">Backend Developer</p>
+          <p class="text-sm text-text-muted mb-6">Handling database management, API endpoints, and server
+            infrastructure.</p>
+          <div class="flex gap-3 mt-auto">
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition-colors border border-glass-border dark:border-slate-700"
+              title="LinkedIn">
+              <span class="material-symbols-outlined text-[20px]">work</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors border border-glass-border dark:border-slate-700"
+              title="Email">
+              <span class="material-symbols-outlined text-[20px]">mail</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 hover:text-text-dark dark:text-slate-100 transition-colors border border-glass-border dark:border-slate-700"
+              title="Website">
+              <span class="material-symbols-outlined text-[20px]">link</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Member 4 -->
+        <div
+          class="p-8 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-glass flex flex-col items-center text-center">
+          <div class="size-24 rounded-full bg-slate-100 mb-6 overflow-hidden border-2 border-orange-500/20"
+            data-alt="Portrait of Member 4">
+            <span
+              class="material-symbols-outlined text-5xl text-slate-400 dark:text-slate-500 w-full h-full flex items-center justify-center">person</span>
+          </div>
+          <h4 class="text-xl font-bold text-text-dark dark:text-slate-100">Member 4</h4>
+          <p class="text-orange-600 text-sm font-medium mb-3">QA Engineer</p>
+          <p class="text-sm text-text-muted mb-6">Focusing on automated testing, quality assurance, and deployment
+            pipelines.</p>
+          <div class="flex gap-3 mt-auto">
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-blue-50 hover:text-blue-600 transition-colors border border-glass-border dark:border-slate-700"
+              title="LinkedIn">
+              <span class="material-symbols-outlined text-[20px]">work</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-red-50 hover:text-red-500 transition-colors border border-glass-border dark:border-slate-700"
+              title="Email">
+              <span class="material-symbols-outlined text-[20px]">mail</span>
+            </a>
+            <a href="#"
+              class="size-10 rounded-full flex items-center justify-center bg-slate-50 dark:bg-slate-800/50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 hover:text-text-dark dark:text-slate-100 transition-colors border border-glass-border dark:border-slate-700"
+              title="Website">
+              <span class="material-symbols-outlined text-[20px]">link</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Roadmap moved below Team text -->
+      <div>
+        <h3 class="text-2xl font-bold text-text-dark dark:text-slate-100 mb-6 text-center">Future Roadmap</h3>
+        <div class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-glass max-w-4xl mx-auto">
+          <ul class="space-y-4">
+            <li class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-primary text-sm mt-1">circle</span>
+              <div>
+                <h5 class="text-text-dark dark:text-slate-100 font-medium text-sm">Multi-Modal Input Support</h5>
+                <p class="text-text-muted text-xs mt-1">Integration of voice commands and gesture recognition for
+                  hands-free automation.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-primary text-sm mt-1">circle</span>
+              <div>
+                <h5 class="text-text-dark dark:text-slate-100 font-medium text-sm">Cross-Platform Compatibility</h5>
+                <p class="text-text-muted text-xs mt-1">Porting the execution engine to support Linux (Wayland/X11)
+                  and macOS environments.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-primary text-sm mt-1">circle</span>
+              <div>
+                <h5 class="text-text-dark dark:text-slate-100 font-medium text-sm">Self-Learning Capabilities</h5>
+                <p class="text-text-muted text-xs mt-1">Implementing reinforcement learning to allow the agent to
+                  optimize workflows over time.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer
+    class="py-12 px-6 border-t border-glass-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-800 dark:bg-slate-900 transition-colors duration-300">
+    <div class="max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+      <div class="flex items-center gap-2">
+        <div class="size-6 rounded bg-primary/10 flex items-center justify-center text-primary">
+          <span class="material-symbols-outlined text-sm">smart_toy</span>
+        </div>
+        <span class="text-text-dark dark:text-slate-100 font-bold text-sm">AI Smart Assistant</span>
+      </div>
+      <div class="text-text-muted text-xs text-center md:text-right">
+        <p>Computer Engineering Department • Final Year Project 2026</p>
+        <p class="mt-1">© 2026 SENTINELS. All rights reserved.</p>
+      </div>
+      <div class="flex gap-4">
+        <a class="text-text-muted hover:text-text-dark dark:text-slate-100 transition-colors" href="#">
+          <span class="material-symbols-outlined">code</span>
+        </a>
+        <a class="text-text-muted hover:text-text-dark dark:text-slate-100 transition-colors" href="#">
+          <span class="material-symbols-outlined">school</span>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const themeToggleBtn = document.getElementById('theme-toggle');
+    const htmlElement = document.documentElement;
+
+    // Check for saved theme preference or use system preference
+    if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      htmlElement.classList.add('dark');
+      htmlElement.classList.remove('light');
+    } else {
+      htmlElement.classList.remove('dark');
+      htmlElement.classList.add('light');
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      htmlElement.classList.toggle('dark');
+      htmlElement.classList.toggle('light');
+
+      // Save preference
+      if (htmlElement.classList.contains('dark')) {
+        localStorage.theme = 'dark';
+      } else {
+        localStorage.theme = 'light';
+      }
+    });
+  </script>
+</body>
+
+</html>
