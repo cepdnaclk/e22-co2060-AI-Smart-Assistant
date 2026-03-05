@@ -39,10 +39,57 @@
       },
     }
   </script>
+  <style>
+    /* ── Background Paths ── */
+    #bg-paths-container {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    #bg-paths-container svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      color: rgb(2, 6, 23);
+      /* slate-950 in light mode */
+    }
+
+    .dark #bg-paths-container svg {
+      color: rgb(255, 255, 255);
+      /* white in dark mode */
+    }
+
+    /* Keep all page content above the fixed bg */
+    body>header,
+    body>section,
+    body>footer {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Light mode: section/footer backgrounds were fully opaque, hiding the
+       animated paths. Make them semi-transparent so the paths show through.
+       Dark mode already uses /80 and /50 Tailwind variants so it's fine. */
+    html.light body>section,
+    html.light body>footer {
+      background-color: rgba(255, 255, 255, 0.82) !important;
+    }
+
+    /* Alternate-row sections (bg-slate-50) keep a slightly cooler tint */
+    html.light body>section:nth-child(odd) {
+      background-color: rgba(248, 250, 252, 0.82) !important;
+    }
+  </style>
 </head>
 
 <body
   class="bg-background-light dark:bg-slate-900 text-text-dark dark:text-slate-100 dark:text-slate-200 font-display antialiased selection:bg-primary selection:text-white overflow-x-hidden transition-colors duration-300">
+  <!-- Fixed animated background paths (non-scrolling) -->
+  <div id="bg-paths-container" aria-hidden="true"></div>
   <header
     class="fixed top-0 left-0 right-0 z-50 border-b border-glass-border dark:border-slate-700 dark:border-slate-800 bg-white dark:bg-slate-800/80 dark:bg-slate-900/80 backdrop-blur-md transition-colors duration-300">
     <div class="max-w-[1280px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -50,7 +97,33 @@
         <div class="size-8 rounded bg-primary/10 flex items-center justify-center text-primary">
           <span class="material-symbols-outlined">smart_toy</span>
         </div>
-        <h1 class="text-text-dark dark:text-slate-100 text-lg font-bold tracking-tight">AI Smart Assistant</h1>
+
+
+        <h1 class="text-text-dark dark:text-slate-100 text-lg font-bold tracking-tight" id="site-title"
+          aria-label="AI Smart Assistant">
+          <span class="gooey-wrapper"
+            style="position:relative; display:inline-block; min-width:180px; height:1.4em; vertical-align:middle;">
+            <!-- SVG gooey filter -->
+            <svg style="position:absolute;height:0;width:0;" aria-hidden="true" focusable="false">
+              <defs>
+                <filter id="gooey-header">
+                  <feColorMatrix in="SourceGraphic" type="matrix" values="1 0 0 0 0
+                            0 1 0 0 0
+                            0 0 1 0 0
+                            0 0 0 255 -140" />
+                </filter>
+              </defs>
+            </svg>
+            <span id="gooey-morph-area"
+              style="filter:url(#gooey-header); display:inline-block; position:relative; width:100%; height:100%;">
+              <span id="gooey-text1" style="position:absolute; left:0; top:0; white-space:nowrap;">AI Smart</span>
+              <span id="gooey-text2" style="position:absolute; left:0; top:0; white-space:nowrap;">Assistant</span>
+            </span>
+          </span>
+        </h1>
+
+
+
       </div>
       <nav class="hidden lg:flex items-center gap-6">
         <a class="text-sm font-medium text-text-muted hover:text-primary transition-colors" href="#home">Home</a>
@@ -70,13 +143,14 @@
           <span class="material-symbols-outlined dark:hidden">dark_mode</span>
           <span class="material-symbols-outlined hidden dark:block">light_mode</span>
         </button>
-        <a class="text-text-muted hover:text-text-dark dark:text-slate-100 transition-colors" href="https://github.com" target="_blank">
+        <a class="text-text-muted hover:text-text-dark dark:text-slate-100 transition-colors" href="https://github.com"
+          target="_blank">
           <span class="material-symbols-outlined">code</span>
         </a>
       </div>
     </div>
   </header>
-  <section class="relative pt-32 pb-20 px-6 overflow-hidden" id="home">
+  <section class="relative min-h-screen flex items-center pt-32 pb-20 px-6 overflow-hidden" id="home">
     <div class="absolute top-0 left-0 w-full h-[600px] bg-subtle-gradient pointer-events-none"></div>
     <div class="max-w-[1280px] mx-auto grid lg:grid-cols-2 gap-12 items-center relative z-10">
       <div class="flex flex-col gap-6">
@@ -168,7 +242,8 @@
       </div>
     </div>
   </section>
-  <section class="py-20 px-6 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-800/50 transition-colors duration-300" id="features">
+  <section class="py-20 px-6 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-800/50 transition-colors duration-300"
+    id="features">
     <div class="max-w-[1280px] mx-auto">
       <div class="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
         <div>
@@ -282,7 +357,8 @@
             <p class="text-text-muted text-sm">PyAutoGUI triggers OS-level events to manipulate the interface.</p>
           </div>
         </div>
-        <div class="lg:col-span-2 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 p-2 md:p-8 shadow-glass"
+        <div
+          class="lg:col-span-2 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 p-2 md:p-8 shadow-glass"
           data-alt="Technical flowchart diagram showing the data flow from Screen Capture to OCR, then to LLM Context Processor, Action Planner, and finally Execution Module">
           <div
             class="w-full h-full min-h-[300px] bg-slate-50 dark:bg-slate-800/50 rounded flex flex-col items-center justify-center p-8 border border-dashed border-slate-200">
@@ -294,7 +370,8 @@
       </div>
     </div>
   </section>
-  <section class="py-20 px-6 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-800/50 transition-colors duration-300" id="tech">
+  <section class="py-20 px-6 bg-slate-50 dark:bg-slate-800/50 dark:bg-slate-800/50 transition-colors duration-300"
+    id="tech">
     <div class="max-w-[1280px] mx-auto">
       <h3 class="text-2xl font-bold text-text-dark dark:text-slate-100 mb-8 text-center">Technology Stack</h3>
       <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -538,7 +615,8 @@
       <!-- Roadmap moved below Team text -->
       <div>
         <h3 class="text-2xl font-bold text-text-dark dark:text-slate-100 mb-6 text-center">Future Roadmap</h3>
-        <div class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-glass max-w-4xl mx-auto">
+        <div
+          class="p-6 rounded-xl border border-glass-border dark:border-slate-700 bg-white dark:bg-slate-800 shadow-glass max-w-4xl mx-auto">
           <ul class="space-y-4">
             <li class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary text-sm mt-1">circle</span>
@@ -594,6 +672,150 @@
   </footer>
 
   <script>
+      /* ── Gooey Text Morphing for site title ── */
+      (function () {
+        const texts = ['AI', 'Intelligent', 'OCR', 'Assistant'];
+        const MORPH_TIME = 1.0;      // seconds for one morph
+        const COOLDOWN_TIME = 0.35;  // seconds to hold before next morph
+
+        const el1 = document.getElementById('gooey-text1');
+        const el2 = document.getElementById('gooey-text2');
+
+        let textIndex = texts.length - 1;
+        let lastTime = performance.now();
+        let morph = 0;
+        let cooldown = COOLDOWN_TIME;
+
+        el1.textContent = texts[textIndex % texts.length];
+        el2.textContent = texts[(textIndex + 1) % texts.length];
+
+        function setMorph(fraction) {
+          el2.style.filter = 'blur(' + Math.min(8 / fraction - 8, 100) + 'px)';
+          el2.style.opacity = Math.pow(fraction, 0.4);
+          var inv = 1 - fraction;
+          el1.style.filter = 'blur(' + Math.min(8 / inv - 8, 100) + 'px)';
+          el1.style.opacity = Math.pow(inv, 0.4);
+        }
+
+        function doCooldown() {
+          morph = 0;
+          el2.style.filter = '';
+          el2.style.opacity = '1';
+          el1.style.filter = '';
+          el1.style.opacity = '0';
+        }
+
+        function doMorph() {
+          morph -= cooldown;
+          cooldown = 0;
+          var fraction = morph / MORPH_TIME;
+          if (fraction > 1) {
+            cooldown = COOLDOWN_TIME;
+            fraction = 1;
+          }
+          setMorph(fraction);
+        }
+
+        function animate(now) {
+          requestAnimationFrame(animate);
+          var dt = (now - lastTime) / 1000;
+          lastTime = now;
+          var shouldIncrement = cooldown > 0;
+          cooldown -= dt;
+          if (cooldown <= 0) {
+            if (shouldIncrement) {
+              textIndex = (textIndex + 1) % texts.length;
+              el1.textContent = texts[textIndex % texts.length];
+              el2.textContent = texts[(textIndex + 1) % texts.length];
+            }
+            doMorph();
+          } else {
+            doCooldown();
+          }
+        }
+
+        requestAnimationFrame(animate);
+      })();
+    /* ── End Gooey Text Morphing ── */
+
+    /* ── Background Paths (ported from BackgroundPaths React component) ── */
+    (function () {
+      var container = document.getElementById('bg-paths-container');
+      var NS = 'http://www.w3.org/2000/svg';
+
+      function buildPathD(i, position) {
+        var p = i * 5 * position;
+        return (
+          'M' + (-380 - p) + ' ' + (-189 + i * 6) +
+          'C' + (-380 - p) + ' ' + (-189 + i * 6) +
+          ' ' + (-312 - p) + ' ' + (216 - i * 6) +
+          ' ' + (152 - p) + ' ' + (343 - i * 6) +
+          'C' + (616 - p) + ' ' + (470 - i * 6) +
+          ' ' + (684 - p) + ' ' + (875 - i * 6) +
+          ' ' + (684 - p) + ' ' + (875 - i * 6)
+        );
+      }
+
+      function createSVGGroup(position) {
+        var svg = document.createElementNS(NS, 'svg');
+        svg.setAttribute('viewBox', '0 0 696 316');
+        svg.setAttribute('fill', 'none');
+        svg.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+        for (var i = 0; i < 36; i++) {
+          var path = document.createElementNS(NS, 'path');
+          path.setAttribute('d', buildPathD(i, position));
+          path.setAttribute('stroke', 'currentColor');
+          path.setAttribute('stroke-width', String(0.5 + i * 0.03));
+          path.setAttribute('stroke-opacity', String(0.1 + i * 0.03));
+          svg.appendChild(path);
+        }
+        return svg;
+      }
+
+      var svg1 = createSVGGroup(1);
+      var svg2 = createSVGGroup(-1);
+      container.appendChild(svg1);
+      container.appendChild(svg2);
+
+      /* Defer so the browser has laid out the SVGs before measuring */
+      requestAnimationFrame(function () {
+        var allPaths = container.querySelectorAll('path');
+        var anims = [];
+
+        allPaths.forEach(function (path, index) {
+          var i = index % 36;
+          var totalLen = 1000; /* safe fallback */
+          try { totalLen = path.getTotalLength() || 1000; } catch (e) { }
+
+          var visibleLen = totalLen * 0.3;
+          path.setAttribute('stroke-dasharray', visibleLen + ' ' + (totalLen - visibleLen));
+
+          var period = 20000 + (index * 7.3 % 10) * 1000; /* 20-30 s */
+          var phase = (index / allPaths.length) * period; /* stagger start */
+          var baseOp = 0.1 + i * 0.03;
+          anims.push({ el: path, totalLen: totalLen, period: period, phase: phase, baseOp: baseOp });
+        });
+
+        var start = performance.now();
+
+        /* Single rAF loop — setAttribute is fully cross-browser for SVG */
+        function loop(now) {
+          var elapsed = now - start;
+          for (var k = 0; k < anims.length; k++) {
+            var a = anims[k];
+            var t = ((elapsed + a.phase) % a.period) / a.period; /* 0 to 1 */
+            a.el.setAttribute('stroke-dashoffset', String(-a.totalLen * t));
+            a.el.setAttribute('stroke-opacity', String(a.baseOp + Math.sin(t * Math.PI) * 0.15));
+          }
+          requestAnimationFrame(loop);
+        }
+
+        requestAnimationFrame(loop);
+      });
+    })();
+    /* ── End Background Paths ── */
+
+
     const themeToggleBtn = document.getElementById('theme-toggle');
     const htmlElement = document.documentElement;
 
