@@ -4,4 +4,6 @@ pytesseract
 pyserial
 keyboard
 pyperclip
-tk
+fastapi
+uvicorn
+websockets

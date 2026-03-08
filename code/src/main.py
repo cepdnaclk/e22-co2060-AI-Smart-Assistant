@@ -9,6 +9,7 @@ import re
 import difflib
 import ctypes
 import multiprocessing
+import subprocess
 
 from src.ocr_module.overlay import RegionSelection
 from src.ocr_module.engine import OCREngine
@@ -42,6 +43,7 @@ running = True
 capture_event = threading.Event()
 is_processing = False
 chat_queue = None
+electron_process = None
 
 # -------------------------- Initialize OCR --------------------------
 try:
@@ -141,7 +143,10 @@ def run_capture_logic():
         solution = find_error_solution(text)
         if solution:
             print(f"[LOCAL DB MATCH] Category: {solution['category']}")
-            print(f"Suggested Fix: {solution['solution']}")
+            suggestion = solution['solution']
+            print(f"Suggested Fix: {suggestion}")
+            if chat_queue:
+                chat_queue.put({"sender": "system", "text": suggestion})
         else:
             print("[LOCAL DB] No match found. Using AI fallback...")
             ai_client = MistralClient()
@@ -188,13 +193,22 @@ def start_tray_icon():
 # -------------------------- Main --------------------------
 def main():
     global chat_queue
+    global electron_process
 
     setup_hotkey()
     print("Background OCR Service Running...")
     print("Capture: Ctrl+Alt+Shift+O | Exit: Ctrl+Alt+Shift+P")
 
-    # Start chat UI process
+    # Start chat UI process (FastAPI server)
     chat_queue, chat_process = chat_ui.start_chat_process()
+
+    # Start Electron UI Subprocess
+    electron_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'electron_ui'))
+    try:
+        electron_process = subprocess.Popen(["cmd.exe", "/c", "npm start"], cwd=electron_dir)
+        print("Electron UI started successfully.")
+    except Exception as e:
+        print(f"Failed to start Electron UI: {e}")
 
     # Start tray icon thread
     tray_thread = threading.Thread(target=start_tray_icon, daemon=True)
@@ -210,6 +224,10 @@ def main():
     print("Exiting program...")
     if chat_process.is_alive():
         chat_process.terminate()
+    if electron_process:
+        electron_process.terminate()
+        # Fallback for Windows to forcefully kill the cmd tree if necessary
+        os.system(f"taskkill /f /pid {electron_process.pid} /t >nul 2>&1")
     os._exit(0)
 
 if __name__ == "__main__":
