@@ -10,7 +10,7 @@ import difflib
 import ctypes
 import multiprocessing
 from src.ai_module.rag import rag_query, build_faiss_index, cache_suggestion
-
+import subprocess
 
 from src.ocr_module.overlay import RegionSelection
 from src.ocr_module.engine import OCREngine
@@ -44,6 +44,7 @@ running = True
 capture_event = threading.Event()
 is_processing = False
 chat_queue = None
+electron_process = None
 
 # -------------------------- Initialize OCR --------------------------
 try:
@@ -132,13 +133,28 @@ def run_capture_logic():
         if chat_queue:
             chat_queue.put(text)
 
-        # --- RAG Retrieval ---
-        suggestion = rag_query(text)
-        print(f"[RAG SUGGESTION] {suggestion}")
+        # Check local DB
+        solution = find_error_solution(text)
+        if solution:
+            print(f"[LOCAL DB MATCH] Category: {solution['category']}")
+            suggestion = solution['solution']
+            print(f"Suggested Fix: {suggestion}")
+            if chat_queue:
+                chat_queue.put({"sender": "system", "text": suggestion})
+        else:
+            print("[LOCAL DB] No match found. Using RAG fallback...")
+            # --- RAG Retrieval ---
+            suggestion = rag_query(text)
+            print(f"[RAG SUGGESTION] {suggestion}")
 
         # Cache suggestion
         cache_suggestion(text, suggestion)
 
+        # 2. Send the AI Suggestion to the UI as 'system'
+        if chat_queue:
+            chat_queue.put({"sender": "system", "text": suggestion})
+        
+        
     except Exception as e:
         print(f"Error in capture logic: {e}")
     finally:
@@ -161,6 +177,7 @@ def start_tray_icon():
 # -------------------------- Main --------------------------
 def main():
     global chat_queue
+    global electron_process
 
     setup_hotkey()
     print("Background OCR Service Running...")
@@ -169,8 +186,18 @@ def main():
     # --- NEW: Build FAISS index from JSON DB ---
     build_faiss_index()
 
+    # Start chat UI process (FastAPI server)
     chat_queue, chat_process = chat_ui.start_chat_process()
 
+    # Start Electron UI Subprocess
+    electron_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'electron_ui'))
+    try:
+        electron_process = subprocess.Popen(["cmd.exe", "/c", "npm start"], cwd=electron_dir)
+        print("Electron UI started successfully.")
+    except Exception as e:
+        print(f"Failed to start Electron UI: {e}")
+
+    # Start tray icon thread
     tray_thread = threading.Thread(target=start_tray_icon, daemon=True)
     tray_thread.start()
 
@@ -183,6 +210,10 @@ def main():
     print("Exiting program...")
     if chat_process.is_alive():
         chat_process.terminate()
+    if electron_process:
+        electron_process.terminate()
+        # Fallback for Windows to forcefully kill the cmd tree if necessary
+        os.system(f"taskkill /f /pid {electron_process.pid} /t >nul 2>&1")
     os._exit(0)
 
 

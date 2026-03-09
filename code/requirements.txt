@@ -10,3 +10,6 @@ llama-index
 sentence-transformers
 transformers
 faiss-cpu
+fastapi
+uvicorn
+websockets
