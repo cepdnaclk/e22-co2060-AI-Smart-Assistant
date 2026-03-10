@@ -174,5 +174,29 @@
     "Error\nOops, something went wrong. Please try\nagain later.": {
         "category": "AI-generated",
         "solution": " Error: indentationerror unexpected indent\n\nExplanation:\nThis error is encountered in Python when the code's indentation is inconsistent. Python uses indentation to define blocks of code. Each block of code should be indented by the same amount of space or tabs.\n\nStep-by-step fix:\n1. Ensure consistent indentation (either spaces or tabs).\n2. Do not mix tabs and spaces.\n3. Use IDE auto-formatting if available.\n\nTo fix the error, you should carefully review your code, particularly around the line causing the error, and ensure that the indentation is consistent with the rest of your code. You can also use your IDE's auto-formatting feature to help maintain consistent indentation.\n\nBackup your code before making changes to avoid accidentally losing any important modifications.\n\nError: python m src.main\n\nExplanation:\nIt appears you are trying to run a Python script named \"src.main\" using the `python m` command. However, the correct command to run a Python script is `python script_name.py`. In this case, the correct command to run the script should be `python src"
+    },
+    "‘architecture.": {
+        "category": "AI-generated",
+        "solution": null
+    },
+    "Eleeelael": {
+        "category": "AI-generated",
+        "solution": null
+    },
+    "src.main": {
+        "category": "AI-generated",
+        "solution": null
+    },
+    "; ee AI-Smart-Assistant\\code ~~ file.": {
+        "category": "AI-generated",
+        "solution": "ERROR SUMMARY:\nThe 'cd' command changes directories in a terminal.\n\nSTEP-BY-STEP FIX:\n1. Verify the directory exists.\n2. Use `dir` (Windows) or `ls` (Linux/macOS) to list directories.\n3. Navigate correctly using `cd ..` or `cd <directory>`.\n\nWARNINGS:\nCheck spelling and case sensitivity of directory names."
+    },
+    "package-lock.json": {
+        "category": "AI-generated",
+        "solution": " Error: indentationerror unexpected indent\n\nExplanation:\nThis error is encountered in Python when the code's indentation is inconsistent. Python uses indentation to define blocks of code. Each block of code should be indented by the same amount of space or tabs.\n\nStep-by-step fix:\n1. Ensure consistent indentation (either spaces or tabs).\n2. Do not mix tabs and spaces.\n3. Use IDE auto-formatting if available.\n\nTo fix the error, you should carefully review your code, particularly around the line causing the error, and ensure that the indentation is consistent with the rest of your code. You can also use your IDE's auto-formatting feature to help maintain consistent indentation.\n\nBackup your code before making changes to avoid accidentally losing any important modifications.\n\nError: python m src.main\n\nExplanation:\nIt appears you are trying to run a Python script named \"src.main\" using the `python m` command. However, the correct command to run a Python script is `python script_name.py`. In this case, the correct command to run the script should be `python src"
+    },
+    "Terminal": {
+        "category": "AI-generated",
+        "solution": " The error \"TRL+C to quit\" is a message that appears in DOS (Disk Operating System) or command prompt windows when a program or command is running and the user wants to stop or exit it. The message suggests that the program or command is not closing properly, and the system is using a default method to terminate it, which is using the keyboard shortcut CTRL+C (TRL stands for \"Translated Raw\", which is a DOS mode).\n\nTo fix this error, you can try the following steps:\n\n1. Press the \"Ctrl+C\" keys on your keyboard. This should send a signal to the running program or command to terminate.\n2. If the program or command does not terminate, you can try closing the command prompt window by clicking on the close button (X) in the top-right corner of the window.\n3. If the program or command is still running, you can try ending the process manually using the Task Manager. To do this, press \"Ctrl+Shift+Esc\" to open the Task Manager, find the program or command in the list of running processes, select it, and click on the \"End Task\" button."
     }
 }
