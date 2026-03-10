@@ -5,6 +5,7 @@ import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
+from src.ai_module.client import MistralClient
 
 app = FastAPI()
 
@@ -44,9 +45,20 @@ async def websocket_endpoint(websocket: WebSocket):
     try:
         while True:
             data = await websocket.receive_text()
-            # If the user sends a message from flutter, broadcast it back (or send to AI)
-            # For now, just echo it to show it works
+            # Echo the user's message back so it appears in the chat
             await manager.broadcast({"sender": "user", "text": data})
+
+            # Call Mistral in a thread so we don't block the event loop
+            def call_mistral(prompt):
+                client = MistralClient()
+                result = client.generate(
+                    f"You are a helpful AI assistant.\nUser: {prompt}\nAssistant:"
+                )
+                return result.get("response") or "⚠️ AI unavailable. Make sure Ollama is running (`ollama run mistral`)."
+
+            loop = asyncio.get_event_loop()
+            ai_reply = await loop.run_in_executor(None, call_mistral, data)
+            await manager.broadcast({"sender": "system", "text": ai_reply})
     except WebSocketDisconnect:
         manager.disconnect(websocket)
 

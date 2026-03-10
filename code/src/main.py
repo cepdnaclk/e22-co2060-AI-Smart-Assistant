@@ -139,18 +139,21 @@ def run_capture_logic():
             print(f"[LOCAL DB MATCH] Category: {solution['category']}")
             suggestion = solution['solution']
             print(f"Suggested Fix: {suggestion}")
-            if chat_queue:
-                chat_queue.put({"sender": "system", "text": suggestion})
         else:
             print("[LOCAL DB] No match found. Using RAG fallback...")
             # --- RAG Retrieval ---
             suggestion = rag_query(text)
             print(f"[RAG SUGGESTION] {suggestion}")
 
-        # Cache suggestion
-        cache_suggestion(text, suggestion)
+        # Guard: if AI returned nothing (e.g. Mistral offline)
+        if not suggestion:
+            suggestion = "⚠️ AI suggestion unavailable. Make sure Ollama is running (`ollama run mistral`)."
 
-        # 2. Send the AI Suggestion to the UI as 'system'
+        # Cache suggestion (only when we have real content)
+        if solution is None and suggestion:
+            cache_suggestion(text, suggestion)
+
+        # Send the AI Suggestion to the UI
         if chat_queue:
             chat_queue.put({"sender": "system", "text": suggestion})
         
