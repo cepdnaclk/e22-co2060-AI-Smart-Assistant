@@ -77,8 +77,8 @@ class MistralClient:
             for line in response.iter_lines():
                 if line:
                     data = json.loads(line.decode("utf-8"))
-                    if "response" in data:
-                        full_text += data["response"]
+                    if "message" in data and "content" in data["message"]:
+                        full_text += data["message"]["content"]
                     if data.get("done"):
                         break
 

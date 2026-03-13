@@ -190,7 +190,8 @@ def main():
     build_faiss_index()
 
     # Start chat UI process (FastAPI server)
-    chat_queue, chat_process = chat_ui.start_chat_process()
+    from src import chatbot_intergrate
+    chat_queue, chat_process = chatbot_intergrate.start_chat_process()
 
     # Start Electron UI Subprocess
     electron_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'electron_ui'))
