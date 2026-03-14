@@ -26,8 +26,8 @@ body {
 }
 
 .window-container {
-    background-color: var(--bg-color);
-    border: 2px solid var(--accent-color);
+    background-color: rgba(1, 1, 16, 0.8);
+    border: 2px solid transparent;
     border-radius: var(--window-radius);
     display: flex;
     flex-direction: column;
@@ -40,13 +40,31 @@ body {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    -webkit-app-region: drag; /* Allows moving the frameless window */
+    -webkit-app-region: drag;
+    /* Allows moving the frameless window */
 }
 
 .title {
     color: var(--accent-color);
     font-weight: 600;
     font-size: 14px;
+}
+
+.window-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    -webkit-app-region: no-drag;
+}
+
+.min-btn {
+    background: none;
+    border: none;
+    color: #F9E2AF;
+    font-size: 16px;
+    cursor: pointer;
+    line-height: 1;
+    padding-bottom: 3px;
 }
 
 .close-btn {
@@ -80,6 +98,7 @@ body {
 .chat-history::-webkit-scrollbar {
     width: 6px;
 }
+
 .chat-history::-webkit-scrollbar-thumb {
     background-color: var(--time-color);
     border-radius: 3px;
@@ -114,11 +133,12 @@ body {
     word-wrap: break-word;
     white-space: pre-wrap;
     font-size: 13px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .bubble.user {
-    background-color: var(--user-bubble-bg);
+    background-color: var(--accent-color);
+    color: #1E1E2E;
     border-bottom-right-radius: 2px;
 }
 
@@ -157,3 +177,43 @@ body {
     align-items: center;
     justify-content: center;
 }
+
+/* Typewriter cursor */
+.cursor {
+    display: inline-block;
+    font-weight: 300;
+    color: var(--accent-color);
+    animation: blink 0.7s step-start infinite;
+    margin-left: 1px;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0; }
+}
+
+/* Typing indicator dots */
+.typing-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 0;
+}
+
+.typing-dots span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--accent-color);
+    opacity: 0.6;
+    animation: dot-bounce 1.2s infinite ease-in-out;
+}
+
+.typing-dots span:nth-child(1) { animation-delay: 0s; }
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes dot-bounce {
+    0%, 80%, 100% { transform: scale(0.8); opacity: 0.4; }
+    40%           { transform: scale(1.2); opacity: 1; }
+}
