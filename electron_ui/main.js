@@ -1,5 +1,13 @@
 const { app, BrowserWindow } = require('electron');
 const path = require('path');
+const os = require('os');
+const fs = require('fs');
+
+// Redirect user data to a temporary folder so locked cache files don't break restarts
+const tempUserDataPath = path.join(os.tmpdir(), 'electron_ui_' + Date.now());
+app.setPath('userData', tempUserDataPath);
+
+app.commandLine.appendSwitch('disable-gpu-disk-cache');
 
 function createWindow() {
     const { screen } = require('electron');
