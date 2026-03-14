@@ -8,6 +8,12 @@ class ChatbotIntegration:
         # Initialize conversation history with a system prompt
         self.history = [{"role": "system", "content": "You are a helpful AI assistant."}]
 
+    def clear_history(self):
+        self.history = [{"role": "system", "content": "You are a helpful AI assistant."}]
+
+    def get_history(self):
+        return self.history
+
     def continue_conversation(self, user_message: str) -> str:
         """
         Appends the user's message to the history, gets the AI response,

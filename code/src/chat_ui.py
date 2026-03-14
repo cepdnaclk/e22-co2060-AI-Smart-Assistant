@@ -41,14 +41,23 @@ manager = ConnectionManager()
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
+    from src.chatbot_intergrate import chatbot
     await manager.connect(websocket)
     try:
+        # Send existing history to the newly connected client
+        for msg in chatbot.get_history():
+            if msg["role"] == "system":
+                continue # skip hidden prompt
+            
+            sender = "user" if msg["role"] == "user" else "system"
+            await websocket.send_text(json.dumps({"sender": sender, "text": msg["content"]}))
+
         while True:
             data = await websocket.receive_text()
             # Echo the user's message back so it appears in the chat
             await manager.broadcast({"sender": "user", "text": data})
 
-            # Call Mistral in a thread so we don't block the event loop
+            # Call Mistral via the patched client (which uses chatbot memory)
             def call_mistral(prompt):
                 client = MistralClient()
                 result = client.generate(
@@ -61,8 +70,11 @@ async def websocket_endpoint(websocket: WebSocket):
             await manager.broadcast({"sender": "system", "text": ai_reply})
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+        # Clear the memory when the chat UI window is closed
+        chatbot.clear_history()
 
 async def check_queue(msg_queue: multiprocessing.Queue):
+    from src.chatbot_intergrate import chatbot
     while True:
         try:
             # Non-blocking get from multiprocessing queue
@@ -75,6 +87,12 @@ async def check_queue(msg_queue: multiprocessing.Queue):
                     sender = "system"
                     message = msg_data
                 
+                # Append OCR suggestions to the history so AI remembers them
+                if sender == "system":
+                    chatbot.history.append({"role": "assistant", "content": message})
+                else:
+                    chatbot.history.append({"role": "user", "content": message})
+
                 # Broadcast the message to all connected Flutter clients
                 await manager.broadcast({"sender": sender, "text": message})
         except queue.Empty:
