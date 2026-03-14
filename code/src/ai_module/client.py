@@ -28,7 +28,7 @@ class MistralClient:
                     "options": {"num_predict": max_tokens}
                 },
                 stream=True,   # <-- important
-                timeout=60     # give it more time
+                timeout=120    # give it more time (increased from 60)
             )
             response.raise_for_status()
 
@@ -69,7 +69,7 @@ class MistralClient:
                     "messages": messages
                 },
                 stream=True,
-                timeout=60
+                timeout=120
             )
             response.raise_for_status()
 

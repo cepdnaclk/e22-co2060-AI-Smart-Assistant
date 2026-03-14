@@ -20,7 +20,8 @@ class ChatbotIntegration:
         
         response_text = result.get("response")
         if not response_text:
-            response_text = "⚠️ AI unavailable. Make sure Ollama is running (`ollama run mistral`)."
+            err_msg = result.get("error", "Unknown error")
+            response_text = f"⚠️ AI unavailable: {err_msg}. Make sure Ollama is running (`ollama run mistral`) and not timing out."
         
         # Append assistant's response to history
         self.history.append({"role": "assistant", "content": response_text})
