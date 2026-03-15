@@ -174,37 +174,5 @@
     "Error\nOops, something went wrong. Please try\nagain later.": {
         "category": "AI-generated",
         "solution": " Error: indentationerror unexpected indent\n\nExplanation:\nThis error is encountered in Python when the code's indentation is inconsistent. Python uses indentation to define blocks of code. Each block of code should be indented by the same amount of space or tabs.\n\nStep-by-step fix:\n1. Ensure consistent indentation (either spaces or tabs).\n2. Do not mix tabs and spaces.\n3. Use IDE auto-formatting if available.\n\nTo fix the error, you should carefully review your code, particularly around the line causing the error, and ensure that the indentation is consistent with the rest of your code. You can also use your IDE's auto-formatting feature to help maintain consistent indentation.\n\nBackup your code before making changes to avoid accidentally losing any important modifications.\n\nError: python m src.main\n\nExplanation:\nIt appears you are trying to run a Python script named \"src.main\" using the `python m` command. However, the correct command to run a Python script is `python script_name.py`. In this case, the correct command to run the script should be `python src"
-    },
-    "‘architecture.": {
-        "category": "AI-generated",
-        "solution": null
-    },
-    "Eleeelael": {
-        "category": "AI-generated",
-        "solution": null
-    },
-    "src.main": {
-        "category": "AI-generated",
-        "solution": null
-    },
-    "; ee AI-Smart-Assistant\\code ~~ file.": {
-        "category": "AI-generated",
-        "solution": "ERROR SUMMARY:\nThe 'cd' command changes directories in a terminal.\n\nSTEP-BY-STEP FIX:\n1. Verify the directory exists.\n2. Use `dir` (Windows) or `ls` (Linux/macOS) to list directories.\n3. Navigate correctly using `cd ..` or `cd <directory>`.\n\nWARNINGS:\nCheck spelling and case sensitivity of directory names."
-    },
-    "package-lock.json": {
-        "category": "AI-generated",
-        "solution": " Error: indentationerror unexpected indent\n\nExplanation:\nThis error is encountered in Python when the code's indentation is inconsistent. Python uses indentation to define blocks of code. Each block of code should be indented by the same amount of space or tabs.\n\nStep-by-step fix:\n1. Ensure consistent indentation (either spaces or tabs).\n2. Do not mix tabs and spaces.\n3. Use IDE auto-formatting if available.\n\nTo fix the error, you should carefully review your code, particularly around the line causing the error, and ensure that the indentation is consistent with the rest of your code. You can also use your IDE's auto-formatting feature to help maintain consistent indentation.\n\nBackup your code before making changes to avoid accidentally losing any important modifications.\n\nError: python m src.main\n\nExplanation:\nIt appears you are trying to run a Python script named \"src.main\" using the `python m` command. However, the correct command to run a Python script is `python script_name.py`. In this case, the correct command to run the script should be `python src"
-    },
-    "Terminal": {
-        "category": "AI-generated",
-        "solution": " The error \"TRL+C to quit\" is a message that appears in DOS (Disk Operating System) or command prompt windows when a program or command is running and the user wants to stop or exit it. The message suggests that the program or command is not closing properly, and the system is using a default method to terminate it, which is using the keyboard shortcut CTRL+C (TRL stands for \"Translated Raw\", which is a DOS mode).\n\nTo fix this error, you can try the following steps:\n\n1. Press the \"Ctrl+C\" keys on your keyboard. This should send a signal to the running program or command to terminate.\n2. If the program or command does not terminate, you can try closing the command prompt window by clicking on the close button (X) in the top-right corner of the window.\n3. If the program or command is still running, you can try ending the process manually using the Task Manager. To do this, press \"Ctrl+Shift+Esc\" to open the Task Manager, find the program or command in the list of running processes, select it, and click on the \"End Task\" button."
-    },
-    "Assistant": {
-        "category": "AI-generated",
-        "solution": " Error: si mesa eau ed\nThis error appears to be non-specific and doesn't seem to be related to a command or a system error. It might be a part of a larger text or a phrase that needs context to understand the issue. If it's related to a software or a program, more information would be needed to provide a solution.\n\nError: ctrl alt shift p\nThis error also appears to be non-specific and doesn't correspond to any common keyboard shortcuts or system errors. It might be a part of a larger text or a phrase that needs context to understand the issue. If it's related to a software or a program, more information would be needed to provide a solution.\n\nRegarding the initial error:\nError: s d academic al smart assistant cd\nThis error occurs when the user tries to use the 'cd' command in an environment where it's not applicable, such as in a text editor or a word processing program. The 'cd' command should be used in a terminal or command prompt. To fix this issue, the user should open a terminal or command prompt and then use the 'cd' command correctly to navigate through directories."
-    },
-    "2 following": {
-        "category": "AI-generated",
-        "solution": " This error message, \"Started server process,\" is a common message in various software applications that involve server processes. However, the error message alone doesn't provide enough context to determine if it's an issue or simply a notification.\n\nIf it's an error, the solution would depend on the specific software or application you're using. Here are some general steps you can take:\n\n1. Check the software's documentation or online resources for information about this error message. The developer may provide troubleshooting steps or known solutions.\n\n2. If the error occurred during server startup, you can try starting the server again. Make sure the server is configured correctly and all required dependencies are installed.\n\n3. If the server fails to start repeatedly, it might be a more serious issue. In this case, you should consult the software's support resources or contact the development team for assistance.\n\n4. If the error is caused by a conflicting program or process, you may need to close or terminate the conflicting program.\n\n5. Sometimes, a system restart can help resolve the issue. Make sure to save all your work before restarting the system.\n\n6. If none of the above"
     }
 }

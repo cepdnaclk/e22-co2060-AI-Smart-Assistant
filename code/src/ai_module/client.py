@@ -28,7 +28,7 @@ class MistralClient:
                     "options": {"num_predict": max_tokens}
                 },
                 stream=True,   # <-- important
-                timeout=60     # give it more time
+                timeout=120    # give it more time (increased from 60)
             )
             response.raise_for_status()
 
@@ -69,7 +69,7 @@ class MistralClient:
                     "messages": messages
                 },
                 stream=True,
-                timeout=60
+                timeout=120
             )
             response.raise_for_status()
 
@@ -77,8 +77,8 @@ class MistralClient:
             for line in response.iter_lines():
                 if line:
                     data = json.loads(line.decode("utf-8"))
-                    if "response" in data:
-                        full_text += data["response"]
+                    if "message" in data and "content" in data["message"]:
+                        full_text += data["message"]["content"]
                     if data.get("done"):
                         break
 
