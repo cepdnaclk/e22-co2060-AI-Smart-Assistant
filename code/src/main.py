@@ -186,8 +186,10 @@ def main():
     print("Background OCR Service Running...")
     print("Capture: Ctrl+Alt+Shift+O | Exit: Ctrl+Alt+Shift+P")
 
-    # --- NEW: Build FAISS index from JSON DB ---
-    build_faiss_index()
+    # --- Build FAISS index in background so startup is not blocked ---
+    faiss_thread = threading.Thread(target=build_faiss_index, daemon=True, name="faiss-index-builder")
+    faiss_thread.start()
+    print("[RAG] FAISS index building in background...")
 
     # Start chat UI process (FastAPI server)
     from src import chatbot_intergrate
