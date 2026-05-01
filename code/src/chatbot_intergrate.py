@@ -1,55 +1,76 @@
-from src.ai_module.client import MistralClient
 import multiprocessing
 import src.chat_ui as chat_ui
+from src.ai_module.client import MistralClient
+from src.memory.user_profile import load_profile
+
 
 class ChatbotIntegration:
     def __init__(self):
         self.client = MistralClient()
-        # Initialize conversation history with a system prompt
-        self.history = [{"role": "system", "content": "You are a helpful AI assistant."}]
+        self._build_system_prompt()
+
+    def _build_system_prompt(self):
+        """Build system prompt dynamically from all user profile fields."""
+        profile = load_profile()
+        context = []
+
+        # Loop through all keys and values in the profile
+        for key, value in profile.items():
+            if isinstance(value, list):
+                # Join lists into a readable string
+                context.append(f"{key.capitalize()}: {', '.join(value)}")
+            else:
+                context.append(f"{key.capitalize()}: {value}")
+
+        context_str = " ".join(context)
+
+        self.history = [{
+            "role": "system",
+            "content": f"You are a helpful AI assistant. Personalize responses and suggestions using this profile: {context_str}"
+        }]
 
     def clear_history(self):
-        self.history = [{"role": "system", "content": "You are a helpful AI assistant."}]
+        """Reset conversation history but keep personalization context."""
+        self._build_system_prompt()
 
     def get_history(self):
         return self.history
 
     def continue_conversation(self, user_message: str) -> str:
-        """
-        Appends the user's message to the history, gets the AI response,
-        appends the AI response to the history, and returns it.
-        """
-        self.history.append({"role": "user", "content": user_message})
-        
-        # Use the chat() method which handles message history
+        profile = load_profile()
+        name = profile.get("name", "User")
+
+        # Add personalized prefix to user message
+        personalized_message = f"{name} asked: {user_message}"
+        self.history.append({"role": "user", "content": personalized_message})
+
         result = self.client.chat(self.history)
-        
         response_text = result.get("response")
         if not response_text:
             err_msg = result.get("error", "Unknown error")
-            response_text = f"⚠️ AI unavailable: {err_msg}. Make sure Ollama is running (`ollama run mistral`) and not timing out."
-        
+            response_text = f"⚠️ AI unavailable: {err_msg}. Make sure Ollama is running (`ollama run mistral`)."
+
         # Append assistant's response to history
         self.history.append({"role": "assistant", "content": response_text})
-        
         return response_text
 
-# Global singleton instance so the history persists across calls processing
+
+# Global singleton instance so the history persists across calls
 chatbot = ChatbotIntegration()
+
 
 def get_chatbot_response(message: str) -> str:
     """Wrapper function to easily call from main.py"""
     return chatbot.continue_conversation(message)
 
-# --- PATCH FOR FASTAPI BACKEND ---
 
+# --- PATCH FOR FASTAPI BACKEND ---
 class PatchedMistralClient:
     def __init__(self, *args, **kwargs):
         pass
-        
+
     def generate(self, prompt: str, *args, **kwargs) -> dict:
         # Extract the original user message from chat_ui's format
-        # chat_ui sends: "You are a helpful AI assistant.\nUser: {prompt}\nAssistant:"
         user_message = prompt
         prefix = "You are a helpful AI assistant.\nUser: "
         suffix = "\nAssistant:"
@@ -57,15 +78,17 @@ class PatchedMistralClient:
             user_message = user_message.split(prefix, 1)[1]
         if user_message.endswith(suffix):
             user_message = user_message.rsplit(suffix, 1)[0]
-            
+
         # Use our memory-enabled singleton chatbot
         res = chatbot.continue_conversation(user_message.strip())
         return {"response": res}
+
 
 def _patched_run_server(msg_queue):
     # Monkey-patch MistralClient in chat_ui so it uses our history-aware client
     chat_ui.MistralClient = PatchedMistralClient
     chat_ui._run_server(msg_queue)
+
 
 def start_chat_process():
     """Starts the FastAPI chat process using the patched client"""
