@@ -39,14 +39,17 @@ def build_faiss_index():
 def rag_query(error_text: str):
     """Retrieve context from FAISS and query Mistral."""
     embedder, index = _get_embedder_and_index()
-    query_embedding = embedder.encode(error_text)
-    D, I = index.search(np.array([query_embedding], dtype="float32"), k=3)
 
-    context = "\n".join([documents[i] for i in I[0] if 0 <= i < len(documents)])
+    # Build context only if the index has entries
+    context = ""
+    if index.ntotal > 0:
+        query_embedding = embedder.encode(error_text)
+        D, I = index.search(np.array([query_embedding], dtype="float32"), k=3)
+        context = "\n".join([documents[i] for i in I[0] if 0 <= i < len(documents)])
+
     ai_client = MistralClient()
-    
     prompt = f"[INST] You are a troubleshooting assistant. Explain the following error and provide a step-by-step fix.\n\nError: {error_text}\nRelevant context from similar errors:\n{context} [/INST]"
-    
+
     ai_response = ai_client.generate(prompt)
     return ai_response.get("response") or ai_response.get("text")
 

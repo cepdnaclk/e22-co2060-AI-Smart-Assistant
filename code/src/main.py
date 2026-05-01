@@ -149,9 +149,16 @@ def run_capture_logic():
         if not suggestion:
             suggestion = "⚠️ AI suggestion unavailable. Make sure Ollama is running (`ollama run mistral`)."
 
-        # Cache suggestion (only when we have real content)
-        if solution is None and suggestion:
+        # Cache suggestion only when it's real AI content (not a fallback warning)
+        is_real_suggestion = (
+            solution is None
+            and suggestion
+            and not suggestion.startswith("⚠️")
+        )
+        if is_real_suggestion:
+            print(f"[DB] Saving new entry to errors_db.json...")
             cache_suggestion(text, suggestion)
+            print(f"[DB] Saved successfully.")
 
         # Send the AI Suggestion to the UI
         if chat_queue:
