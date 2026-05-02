@@ -99,6 +99,11 @@ def on_quit(icon_obj, item):
 def exit_app_hotkey():
     global running
     print("Exit hotkey pressed. Exiting...")
+    if chat_queue:
+        chat_queue.put({"action": "quit"})
+    
+    # Wait half a second so the quit action can be broadcasted to the UI
+    time.sleep(0.5)
     running = False
     if icon:
         icon.stop()
@@ -110,12 +115,17 @@ def trigger_capture():
         print("Capture in progress... ignoring press.")
         return
     is_processing = True
+    # Hide chat window so it's out of the way during region selection
+    if chat_queue:
+        chat_queue.put({"action": "hide"})
     capture_event.set()
 
 def run_capture_logic():
     global is_processing
     print("Hotkey triggered!")
     try:
+        # Wait for the Electron window to finish hiding before opening the overlay
+        time.sleep(0.4)
         region_selector = RegionSelection()
         selection = region_selector.get_region()
         if not selection:
@@ -131,7 +141,7 @@ def run_capture_logic():
         copy_to_clipboard(text)
 
         if chat_queue:
-            chat_queue.put(text)
+            chat_queue.put({"sender": "system", "text": f"OCR Input: {text}", "role": "user"})
 
         # Check local DB
         solution = find_error_solution(text)
