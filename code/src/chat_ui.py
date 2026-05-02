@@ -80,20 +80,25 @@ async def check_queue(msg_queue: multiprocessing.Queue):
             # Non-blocking get from multiprocessing queue
             msg_data = msg_queue.get_nowait()
             if msg_data:
+                # Action messages (e.g. hide, quit) — pass straight to UI, skip history
+                if isinstance(msg_data, dict) and "action" in msg_data:
+                    await manager.broadcast(msg_data)
+                    await asyncio.sleep(0.1)
+                    continue
+
                 if isinstance(msg_data, dict):
                     sender = msg_data.get("sender", "system")
                     message = msg_data.get("text", "")
+                    role = msg_data.get("role", "assistant" if sender == "system" else "user")
                 else:
                     sender = "system"
                     message = msg_data
+                    role = "assistant"
                 
-                # Append OCR suggestions to the history so AI remembers them
-                if sender == "system":
-                    chatbot.history.append({"role": "assistant", "content": message})
-                else:
-                    chatbot.history.append({"role": "user", "content": message})
+                # Append to the history so AI remembers them
+                chatbot.history.append({"role": role, "content": message})
 
-                # Broadcast the message to all connected Flutter clients
+                # Broadcast the message to all connected clients
                 await manager.broadcast({"sender": sender, "text": message})
         except queue.Empty:
             pass
