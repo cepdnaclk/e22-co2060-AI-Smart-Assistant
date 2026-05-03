@@ -1,7 +1,10 @@
 {
-  "name": "Sooriya",
+  "full_name": "Kavindu Nipun Sooriyabandara",
+  "nickname": "Sooriya",
+  "occupation": "Computer Engineering Undergraduate",
+  "university": "University of Peradeniya",
   "preferred_theme": "dark",
   "answer_style": "concise",
   "favorite_language": "Python",
-  "favorite_colour": "blue"
+  "favorite_colours": ["blue", "black"]
 }
