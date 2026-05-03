@@ -24,9 +24,15 @@ class ChatbotIntegration:
 
         context_str = " ".join(context)
 
+        # Explicitly mark these as USER attributes, not assistant preferences
         self.history = [{
             "role": "system",
-            "content": f"You are a helpful AI assistant. Personalize responses and suggestions using this profile: {context_str}"
+            "content": (
+                "You are a helpful AI assistant. "
+                "The following details describe the USER you are assisting. "
+                "Use them to personalize responses, but do not claim them as your own preferences: "
+                f"{context_str}"
+            )
         }]
 
     def clear_history(self):
@@ -37,18 +43,17 @@ class ChatbotIntegration:
         return self.history
 
     def continue_conversation(self, user_message: str) -> str:
-        profile = load_profile()
-        name = profile.get("name", "User")
-
-        # Add personalized prefix to user message
-        personalized_message = f"{name} asked: {user_message}"
-        self.history.append({"role": "user", "content": personalized_message})
+        # Add raw user message without artificial prefixes
+        self.history.append({"role": "user", "content": user_message})
 
         result = self.client.chat(self.history)
         response_text = result.get("response")
         if not response_text:
             err_msg = result.get("error", "Unknown error")
-            response_text = f"⚠️ AI unavailable: {err_msg}. Make sure Ollama is running (`ollama run mistral`)."
+            response_text = (
+                f"⚠️ AI unavailable: {err_msg}. "
+                f"Make sure Ollama is running (`ollama run mistral`)."
+            )
 
         # Append assistant's response to history
         self.history.append({"role": "assistant", "content": response_text})
@@ -79,7 +84,7 @@ class PatchedMistralClient:
         if user_message.endswith(suffix):
             user_message = user_message.rsplit(suffix, 1)[0]
 
-        # Use our memory-enabled singleton chatbot
+        # Pass the raw user message directly
         res = chatbot.continue_conversation(user_message.strip())
         return {"response": res}
 
@@ -93,6 +98,10 @@ def _patched_run_server(msg_queue):
 def start_chat_process():
     """Starts the FastAPI chat process using the patched client"""
     msg_queue = multiprocessing.Queue()
-    p = multiprocessing.Process(target=_patched_run_server, args=(msg_queue,), daemon=True)
+    p = multiprocessing.Process(
+        target=_patched_run_server,
+        args=(msg_queue,),
+        daemon=True
+    )
     p.start()
     return msg_queue, p
