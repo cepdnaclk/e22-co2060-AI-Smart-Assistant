@@ -124,7 +124,6 @@ def run_capture_logic():
     global is_processing
     print("Hotkey triggered!")
     try:
-        # Wait for the Electron window to finish hiding before opening the overlay
         time.sleep(0.4)
         region_selector = RegionSelection()
         selection = region_selector.get_region()
@@ -143,17 +142,21 @@ def run_capture_logic():
         if chat_queue:
             chat_queue.put({"sender": "system", "text": f"OCR Input: {text}", "role": "user"})
 
-        # Check local DB
+        # --- DB + RAG logic ---
         solution = find_error_solution(text)
+        suggestion = None
+
         if solution:
-            print(f"[LOCAL DB MATCH] Category: {solution['category']}")
-            suggestion = solution['solution']
-            print(f"Suggested Fix: {suggestion}")
+            print(f"[LOCAL DB MATCH] Category: {solution.get('category')}")
+            suggestion = solution.get('solution')
+
+            # If DB entry is empty or placeholder, fallback to RAG
+            if not suggestion or suggestion.strip() in ["", "N/A", "unavailable"]:
+                print("[LOCAL DB] Entry incomplete. Falling back to RAG...")
+                suggestion = rag_query(text)
         else:
             print("[LOCAL DB] No match found. Using RAG fallback...")
-            # --- RAG Retrieval ---
             suggestion = rag_query(text)
-            print(f"[RAG SUGGESTION] {suggestion}")
 
         # Guard: if AI returned nothing (e.g. Mistral offline)
         if not suggestion:
@@ -161,7 +164,7 @@ def run_capture_logic():
 
         # Cache suggestion only when it's real AI content (not a fallback warning)
         is_real_suggestion = (
-            solution is None
+            (solution is None or not solution.get('solution'))  # either no DB or incomplete DB
             and suggestion
             and not suggestion.startswith("⚠️")
         )
@@ -173,8 +176,7 @@ def run_capture_logic():
         # Send the AI Suggestion to the UI
         if chat_queue:
             chat_queue.put({"sender": "system", "text": suggestion})
-        
-        
+
     except Exception as e:
         print(f"Error in capture logic: {e}")
     finally:
