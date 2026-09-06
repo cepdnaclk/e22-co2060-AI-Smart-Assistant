@@ -9,6 +9,7 @@ import re
 import difflib
 import ctypes
 import multiprocessing
+import socket
 from src.ai_module.rag import rag_query, build_faiss_index, cache_suggestion
 import subprocess
 
@@ -196,6 +197,11 @@ def start_tray_icon():
     icon.title = "OCR Tool"
     icon.run()
 
+def select_chat_port():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as probe:
+        probe.bind(("127.0.0.1", 0))
+        return probe.getsockname()[1]
+
 # -------------------------- Main --------------------------
 def main():
     global chat_queue
@@ -209,6 +215,10 @@ def main():
     faiss_thread = threading.Thread(target=build_faiss_index, daemon=True, name="faiss-index-builder")
     faiss_thread.start()
     print("[RAG] FAISS index building in background...")
+
+    # Pick a free port so an orphaned previous server cannot block startup.
+    os.environ["CHAT_SERVER_PORT"] = str(select_chat_port())
+    print(f"Chat server port: {os.environ['CHAT_SERVER_PORT']}")
 
     # Start chat UI process (FastAPI server)
     from src import chatbot_intergrate

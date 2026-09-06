@@ -2,6 +2,7 @@ import multiprocessing
 import queue
 import asyncio
 import json
+import os
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -119,7 +120,8 @@ global_msg_queue = None
 def _run_server(msg_queue):
     global global_msg_queue
     global_msg_queue = msg_queue
-    uvicorn.run(app, host="0.0.0.0", port=8000, log_level="info")
+    port = int(os.environ.get("CHAT_SERVER_PORT", "8000"))
+    uvicorn.run(app, host="127.0.0.1", port=port, log_level="info")
 
 def start_chat_process():
     """
