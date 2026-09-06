@@ -9,6 +9,7 @@ import re
 import difflib
 import ctypes
 import multiprocessing
+import shutil
 from src.ai_module.rag import rag_query, build_faiss_index, cache_suggestion
 import subprocess
 
@@ -30,7 +31,16 @@ except Exception:
 
 # -------------------------- Config Paths --------------------------
 CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
-DB_FILE = os.path.join(os.path.dirname(__file__), 'errors_db.json')
+SOURCE_DB_FILE = os.path.join(os.path.dirname(__file__), 'errors_db.json')
+DATA_DIR = os.environ.get("AI_ASSISTANT_DATA_DIR")
+if DATA_DIR:
+    os.makedirs(DATA_DIR, exist_ok=True)
+    DB_FILE = os.path.join(DATA_DIR, 'errors_db.json')
+    if not os.path.exists(DB_FILE) and os.path.exists(SOURCE_DB_FILE):
+        shutil.copy2(SOURCE_DB_FILE, DB_FILE)
+else:
+    DB_FILE = SOURCE_DB_FILE
+CAPTURE_REQUEST_FILE = os.path.join(DATA_DIR, "capture.request") if DATA_DIR else None
 
 def load_config():
     if os.path.exists(CONFIG_PATH):
@@ -40,6 +50,10 @@ def load_config():
 
 config = load_config()
 TESSERACT_CMD = config.get("tesseract_cmd", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
+if not os.path.exists(TESSERACT_CMD):
+    bundled_tesseract = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'tesseract', 'tesseract.exe'))
+    if os.path.exists(bundled_tesseract):
+        TESSERACT_CMD = bundled_tesseract
 
 # -------------------------- Globals --------------------------
 ocr = None
@@ -119,7 +133,7 @@ def trigger_capture():
         print("Capture in progress... ignoring press.")
         return
     is_processing = True
-    # Hide chat window so it's out of the way during region selection
+    # Hide chat window so it cannot interfere with region selection
     if chat_queue:
         chat_queue.put({"action": "hide"})
     capture_event.set()
@@ -136,6 +150,9 @@ def run_capture_logic():
         if not selection:
             print("Selection cancelled.")
             return
+
+        if ocr is None:
+            raise RuntimeError("OCR is unavailable. Check the Tesseract installation.")
 
         text = ocr.capture_and_extract(selection)
         if not text:
@@ -201,14 +218,26 @@ def run_capture_logic():
 
     except Exception as e:
         print(f"Error in capture logic: {e}")
+        if chat_queue:
+            chat_queue.put({"sender": "system", "text": f"Capture processing failed: {e}"})
     finally:
         is_processing = False
 
 
 # -------------------------- Hotkeys & Tray --------------------------
 def setup_hotkey():
-    keyboard.add_hotkey('ctrl+alt+shift+o', trigger_capture)
+    if not CAPTURE_REQUEST_FILE:
+        keyboard.add_hotkey('ctrl+alt+shift+o', trigger_capture)
     keyboard.add_hotkey('ctrl+alt+shift+p', exit_app_hotkey)
+
+def check_capture_request():
+    if not CAPTURE_REQUEST_FILE or not os.path.exists(CAPTURE_REQUEST_FILE):
+        return
+    try:
+        os.remove(CAPTURE_REQUEST_FILE)
+        trigger_capture()
+    except OSError as e:
+        print(f"Capture request error: {e}")
 
 def start_tray_icon():
     global icon
@@ -226,6 +255,7 @@ def main():
     setup_hotkey()
     print("Background OCR Service Running...")
     print("Capture: Ctrl+Alt+Shift+O | Exit: Ctrl+Alt+Shift+P")
+    print("Open chat: Ctrl+Alt+Shift+C")
 
     # --- Build FAISS index in background so startup is not blocked ---
     faiss_thread = threading.Thread(target=build_faiss_index, daemon=True, name="faiss-index-builder")
@@ -236,19 +266,23 @@ def main():
     from src import chatbot_intergrate
     chat_queue, chat_process = chatbot_intergrate.start_chat_process()
 
-    # Start Electron UI Subprocess
-    electron_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'electron_ui'))
-    try:
-        electron_process = subprocess.Popen(["cmd.exe", "/c", "npm start"], cwd=electron_dir)
-        print("Electron UI started successfully.")
-    except Exception as e:
-        print(f"Failed to start Electron UI: {e}")
+    # Packaged Electron starts this service; development mode starts Electron here.
+    if os.environ.get("AI_ASSISTANT_ELECTRON_MANAGED") == "1":
+        print("Electron-managed mode: using the parent desktop application.")
+    else:
+        electron_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'electron_ui'))
+        try:
+            electron_process = subprocess.Popen(["cmd.exe", "/c", "npm start"], cwd=electron_dir)
+            print("Electron UI started successfully.")
+        except Exception as e:
+            print(f"Failed to start Electron UI: {e}")
 
     # Start tray icon thread
     tray_thread = threading.Thread(target=start_tray_icon, daemon=True)
     tray_thread.start()
 
     while running:
+        check_capture_request()
         if capture_event.is_set():
             capture_event.clear()
             run_capture_logic()

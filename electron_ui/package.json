@@ -1,10 +1,12 @@
 {
   "name": "electron_ui",
   "version": "1.0.0",
-  "description": "",
+  "description": "Desktop chat interface for the AI Smart Assistant",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
+    "dist": "electron-builder --win nsis",
+    "dist:dir": "electron-builder --win --dir",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -12,6 +14,41 @@
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "electron": "^40.8.0"
+    "electron": "^40.8.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "com.sentinals.aismartassistant",
+    "productName": "AI Smart Assistant",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist{,/**}",
+      "!.electron_cache{,/**}"
+    ],
+    "extraResources": [
+      {
+        "from": "../code/src",
+        "to": "assistant/code/src"
+      },
+      {
+        "from": "../code/tesseract",
+        "to": "assistant/code/tesseract"
+      }
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    }
   }
 }

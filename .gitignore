@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Node dependencies
+node_modules/
+
 # C extensions
 *.so
 
@@ -136,3 +139,7 @@ cython_debug/
 
 # Electron local cache (generated at runtime)
 electron_ui/.electron_cache/
+
+# Keep the Electron application icon in source control
+!electron_ui/build/
+!electron_ui/build/icon.ico

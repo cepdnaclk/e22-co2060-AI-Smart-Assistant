@@ -52,10 +52,24 @@ For now this use local AI model.
    ```
 
 2. Run the application:
-   go to ```bash AI-Smart-Assistant\code``` file.
-   Then
    ```bash
+   cd code
    python -m src.main
    ```
+
+### Build the Windows chat application
+
+The Electron chat client can be packaged with its custom application icon:
+
+```bash
+cd electron_ui
+npm install
+npm run dist
+```
+
+The installer is written to `electron_ui/dist/AI Smart Assistant Setup 1.0.0.exe`.
+The installed application starts the bundled Python service automatically. Python and the
+project dependencies must be installed on the target computer, and Tesseract must be
+available at the path configured in `code/src/config.json`.
 
 ---

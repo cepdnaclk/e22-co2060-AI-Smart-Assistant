@@ -1,5 +1,3 @@
-const ws = new WebSocket('ws://localhost:8000/ws');
-
 const chatHistory = document.getElementById('chat-history');
 const chatInput = document.getElementById('chat-input');
 const sendBtn = document.getElementById('send-btn');
@@ -8,52 +6,67 @@ let thinkingBubble = null; // Track the "thinking..." indicator
 const minBtn = document.getElementById('min-btn');
 
 const { ipcRenderer } = require('electron');
+let ws = null;
+let reconnectTimer = null;
+let isConnected = false;
+
+function connectWebSocket() {
+    ws = new WebSocket('ws://127.0.0.1:8000/ws');
+
+    ws.onopen = () => {
+        isConnected = true;
+        console.log('Connected to WebSocket server');
+    };
+
+    ws.onmessage = (event) => {
+        try {
+            const data = JSON.parse(event.data);
+
+            if (data.action) {
+                if (data.action === 'hide') {
+                    ipcRenderer.send('hide-window');
+                } else if (data.action === 'minimize') {
+                    ipcRenderer.send('minimize-window');
+                } else if (data.action === 'quit') {
+                    window.close();
+                }
+                return;
+            }
+
+            if (data.sender === 'system') {
+                removeThinking();
+            }
+
+            ipcRenderer.send('show-window');
+            addMessage(data.text, data.sender);
+        } catch (e) {
+            removeThinking();
+            ipcRenderer.send('show-window');
+            addMessage(event.data, 'system');
+        }
+    };
+
+    ws.onclose = () => {
+        isConnected = false;
+        console.log('Disconnected from WebSocket server; retrying...');
+        reconnectTimer = setTimeout(connectWebSocket, 1000);
+    };
+
+    ws.onerror = (error) => {
+        console.error('WebSocket connection error:', error);
+        ws.close();
+    };
+}
+
+connectWebSocket();
 
 closeBtn.addEventListener('click', () => {
-    ipcRenderer.send('hide-window');
+    ipcRenderer.send('quit-app');
 });
 
 minBtn.addEventListener('click', () => {
     ipcRenderer.send('minimize-window');
 });
-
-ws.onopen = () => {
-    console.log('Connected to WebSocket server');
-};
-
-ws.onmessage = (event) => {
-    try {
-        const data = JSON.parse(event.data);
-
-        // Handle action messages (hide, quit) without showing the window
-        if (data.action) {
-            if (data.action === 'hide') {
-                ipcRenderer.send('hide-window');
-            } else if (data.action === 'quit') {
-                window.close();
-            }
-            return;
-        }
-
-        // Remove the thinking indicator when an AI response arrives
-        if (data.sender === 'system') {
-            removeThinking();
-        }
-
-        // Only show the window for actual chat messages
-        ipcRenderer.send('show-window');
-        addMessage(data.text, data.sender);
-    } catch (e) {
-        // Fallback for simple string
-        removeThinking();
-        ipcRenderer.send('show-window');
-        addMessage(event.data, 'system');
-    }
-};
-
-ws.onclose = () => {
-    console.log('Disconnected from WebSocket server');
-};
 
 function formatTime() {
     const now = new Date();
@@ -143,13 +156,15 @@ function removeThinking() {
 
 function sendMessage() {
     const text = chatInput.value.trim();
-    if (text) {
+    if (text && ws && isConnected && ws.readyState === WebSocket.OPEN) {
         ws.send(text);
         chatInput.value = '';
         chatInput.focus();
         // Show "Thinking..." after user sends a message
         // Small delay so the user message appears first
         setTimeout(showThinking, 100);
+    } else if (text) {
+        addMessage('Chat service is still connecting. Please try again in a moment.', 'system');
     }
 }
 

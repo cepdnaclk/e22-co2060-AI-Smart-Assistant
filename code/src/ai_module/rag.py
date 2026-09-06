@@ -3,7 +3,11 @@ import json
 import numpy as np
 from src.ai_module.client import MistralClient
 
-DB_FILE = os.path.join(os.path.dirname(__file__), "..", "errors_db.json")
+DATA_DIR = os.environ.get("AI_ASSISTANT_DATA_DIR")
+DB_FILE = os.path.join(
+    DATA_DIR if DATA_DIR else os.path.join(os.path.dirname(__file__), ".."),
+    "errors_db.json",
+)
 
 # Lazy-loaded globals — only initialized on first use
 _embedder = None
