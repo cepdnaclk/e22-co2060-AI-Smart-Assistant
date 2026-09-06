@@ -57,13 +57,9 @@ async def websocket_endpoint(websocket: WebSocket):
             # Echo the user's message back so it appears in the chat
             await manager.broadcast({"sender": "user", "text": data})
 
-            # Call Mistral via the patched client (which uses chatbot memory)
+            # Call Mistral via the chatbot integration (which uses user memory and profile)
             def call_mistral(prompt):
-                client = MistralClient()
-                result = client.generate(
-                    f"You are a helpful AI assistant.\nUser: {prompt}\nAssistant:"
-                )
-                return result.get("response") or "⚠️ AI unavailable. Make sure Ollama is running (`ollama run mistral`)."
+                return chatbot.continue_conversation(prompt)
 
             loop = asyncio.get_event_loop()
             ai_reply = await loop.run_in_executor(None, call_mistral, data)

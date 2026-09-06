@@ -13,3 +13,4 @@ faiss-cpu
 fastapi
 uvicorn
 websockets
+beautifulsoup4

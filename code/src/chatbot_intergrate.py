@@ -2,6 +2,11 @@ import multiprocessing
 import src.chat_ui as chat_ui
 from src.ai_module.client import MistralClient
 from src.memory.user_profile import load_profile
+from src.ai_module.router import handle_user_query
+from src.ai_module.router import handle_user_query
+from src.ai_module.search_module import web_search_tavily
+from src.ai_module.client import MistralClient
+from src.ai_module.router import handle_user_query
 
 
 class ChatbotIntegration:
@@ -42,22 +47,22 @@ class ChatbotIntegration:
     def get_history(self):
         return self.history
 
+
     def continue_conversation(self, user_message: str) -> str:
-        # Add raw user message without artificial prefixes
         self.history.append({"role": "user", "content": user_message})
 
-        result = self.client.chat(self.history)
-        response_text = result.get("response")
-        if not response_text:
-            err_msg = result.get("error", "Unknown error")
-            response_text = (
-                f"⚠️ AI unavailable: {err_msg}. "
-                f"Make sure Ollama is running (`ollama run mistral`)."
-            )
+        response_text = handle_user_query(user_message, self.history)
 
-        # Append assistant's response to history
+        if not response_text:
+            response_text = "⚠️ AI unavailable. Make sure Ollama is running (`ollama run mistral`)."
+
         self.history.append({"role": "assistant", "content": response_text})
         return response_text
+
+
+
+
+
 
 
 # Global singleton instance so the history persists across calls

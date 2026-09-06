@@ -17,6 +17,10 @@ from src.ocr_module.engine import OCREngine
 from src.automation.comms import copy_to_clipboard
 from src.ai_module.client import MistralClient
 from src import chat_ui  # Tkinter chat window module
+import requests
+from bs4 import BeautifulSoup
+from src.ai_module.search_module import web_search_tavily
+from src.ai_module.client import MistralClient
 
 # -------------------------- DPI Awareness --------------------------
 try:
@@ -120,6 +124,8 @@ def trigger_capture():
         chat_queue.put({"action": "hide"})
     capture_event.set()
 
+
+
 def run_capture_logic():
     global is_processing
     print("Hotkey triggered!")
@@ -158,13 +164,29 @@ def run_capture_logic():
             print("[LOCAL DB] No match found. Using RAG fallback...")
             suggestion = rag_query(text)
 
-        # Guard: if AI returned nothing (e.g. Mistral offline)
-        if not suggestion:
-            suggestion = "⚠️ AI suggestion unavailable. Make sure Ollama is running (`ollama run mistral`)."
+        # --- Web Search fallback ---
+        if not suggestion or suggestion.strip() in ["", "N/A", "unavailable", "⚠️ AI suggestion unavailable. Make sure Ollama is running (`ollama run mistral`)."]:
+            print("[RAG] No useful suggestion. Falling back to Web Search...")
+            search_results = web_search_tavily(text)
+
+            # Always print what Tavily returned
+            print(f"[DEBUG] Tavily raw results: {search_results}")
+
+            if search_results:
+                print(f"[DEBUG] Tavily returned {len(search_results)} results")
+                for idx, r in enumerate(search_results, 1):
+                    print(f"[DEBUG] Result {idx}: {r}")
+
+                context = "\n".join(search_results)
+                prompt = f"Summarize and answer based on these search results:\n{context}\n\nQuestion: {text}"
+                suggestion = MistralClient().chat(prompt)
+            else:
+                print("[DEBUG] Tavily returned no results")
+                suggestion = "⚠️ No web search results found."
 
         # Cache suggestion only when it's real AI content (not a fallback warning)
         is_real_suggestion = (
-            (solution is None or not solution.get('solution'))  # either no DB or incomplete DB
+            (solution is None or not solution.get('solution'))
             and suggestion
             and not suggestion.startswith("⚠️")
         )
