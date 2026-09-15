@@ -4,11 +4,15 @@ const sendBtn = document.getElementById('send-btn');
 const closeBtn = document.getElementById('close-btn');
 let thinkingBubble = null; // Track the "thinking..." indicator
 const minBtn = document.getElementById('min-btn');
-const newChatBtn = document.getElementById('new-chat-btn');
+const newChatMenuBtn = document.getElementById('new-chat-menu-btn');
 const statusDot = document.getElementById('status-dot');
 const connectionStatus = document.getElementById('connection-status');
 const quickActions = document.querySelectorAll('.quick-actions button');
-const captureBtn = document.getElementById('capture-btn');
+const menuBtn = document.getElementById('menu-btn');
+const quickCaptureBtn = document.getElementById('quick-capture-btn');
+const menuDropdown = document.getElementById('menu-dropdown');
+const captureMenuBtn = document.getElementById('capture-menu-btn');
+const settingsMenuBtn = document.getElementById('settings-menu-btn');
 
 const { ipcRenderer } = require('electron');
 let ws = null;
@@ -167,10 +171,33 @@ function sendAction(action) {
     return false;
 }
 
-captureBtn.addEventListener('click', () => {
+menuBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    menuDropdown.classList.toggle('show');
+});
+
+quickCaptureBtn.addEventListener('click', () => {
     if (!sendAction('capture')) {
         addMessage('Capture is still connecting. Please try again in a moment.', 'system');
     }
+});
+
+document.addEventListener('click', (e) => {
+    if (!menuDropdown.contains(e.target) && e.target !== menuBtn) {
+        menuDropdown.classList.remove('show');
+    }
+});
+
+captureMenuBtn.addEventListener('click', () => {
+    menuDropdown.classList.remove('show');
+    if (!sendAction('capture')) {
+        addMessage('Capture is still connecting. Please try again in a moment.', 'system');
+    }
+});
+
+settingsMenuBtn.addEventListener('click', () => {
+    menuDropdown.classList.remove('show');
+    addMessage('Settings feature coming soon.', 'system');
 });
 
 function regenerateLastResponse() {
@@ -217,7 +244,8 @@ function sendMessage() {
 
 sendBtn.addEventListener('click', sendMessage);
 
-newChatBtn.addEventListener('click', () => {
+newChatMenuBtn.addEventListener('click', () => {
+    menuDropdown.classList.remove('show');
     if (sendAction('clear_history')) {
         chatHistory.innerHTML = '';
         chatInput.focus();

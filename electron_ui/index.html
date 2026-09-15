@@ -1,25 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Smart Assistant</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <div class="window-container">
         <div class="header">
-            <div class="title-group">
-                <span class="status-dot" id="status-dot"></span>
-                <span class="title">AI ASSISTANT</span>
-                <span class="connection-status" id="connection-status">Connecting</span>
+            <div class="header-left">
+                <div class="header-left-col">
+                    <div class="title-group">
+                        <span class="status-dot" id="status-dot"></span>
+                        <span class="title">SENTINEL</span>
+                        <button class="quick-capture-btn" id="quick-capture-btn" title="Capture Screen" aria-label="Capture Screen">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                                <circle cx="12" cy="13" r="3"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <div class="subtitle-group">
+                        <button class="menu-btn" id="menu-btn" title="Menu" aria-label="Menu">☰</button>
+                        <span class="connection-status" id="connection-status">Connecting</span>
+                    </div>
+                </div>
             </div>
             <div class="window-controls">
-                <button class="capture-btn" id="capture-btn" title="Capture text from your screen" aria-label="Capture text from your screen">Capture</button>
-                <button class="header-btn" id="new-chat-btn" title="Start a new chat" aria-label="Start a new chat">＋</button>
                 <button class="min-btn" id="min-btn">─</button>
                 <button class="close-btn" id="close-btn">✕</button>
             </div>
+        </div>
+        
+        <div class="menu-dropdown" id="menu-dropdown">
+            <button class="menu-item" id="new-chat-menu-btn">New Chat</button>
+            <button class="menu-item" id="capture-menu-btn">Capture Screen</button>
+            <button class="menu-item" id="settings-menu-btn">Settings</button>
         </div>
         <div class="chat-container">
             <div class="chat-history" id="chat-history">
@@ -40,4 +59,5 @@
     </div>
     <script src="renderer.js"></script>
 </body>
+
 </html>
