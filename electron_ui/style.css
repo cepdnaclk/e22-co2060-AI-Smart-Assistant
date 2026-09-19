@@ -44,10 +44,16 @@ body {
     /* Allows moving the frameless window */
 }
 
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .header-left-col {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .menu-btn {

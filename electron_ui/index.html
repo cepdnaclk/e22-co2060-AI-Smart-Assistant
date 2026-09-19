@@ -12,29 +12,28 @@
     <div class="window-container">
         <div class="header">
             <div class="header-left">
-                <div class="header-left-col">
-                    <div class="title-group">
-                        <span class="status-dot" id="status-dot"></span>
-                        <span class="title">SENTINEL</span>
-                        <button class="quick-capture-btn" id="quick-capture-btn" title="Capture Screen" aria-label="Capture Screen">
-                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
-                                <circle cx="12" cy="13" r="3"/>
-                            </svg>
-                        </button>
-                    </div>
-                    <div class="subtitle-group">
-                        <button class="menu-btn" id="menu-btn" title="Menu" aria-label="Menu">☰</button>
-                        <span class="connection-status" id="connection-status">Connecting</span>
-                    </div>
+                <button class="menu-btn" id="menu-btn" title="Menu" aria-label="Menu">☰</button>
+                <div class="title-group">
+                    <span class="status-dot" id="status-dot"></span>
+                    <span class="title">SENTINEL</span>
+                    <span class="connection-status" id="connection-status">- Connecting</span>
                 </div>
             </div>
             <div class="window-controls">
+                <button class="quick-capture-btn" id="quick-capture-btn" title="Capture Screen"
+                    aria-label="Capture Screen">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path
+                            d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" />
+                        <circle cx="12" cy="13" r="3" />
+                    </svg>
+                </button>
                 <button class="min-btn" id="min-btn">─</button>
                 <button class="close-btn" id="close-btn">✕</button>
             </div>
         </div>
-        
+
         <div class="menu-dropdown" id="menu-dropdown">
             <button class="menu-item" id="new-chat-menu-btn">New Chat</button>
             <button class="menu-item" id="capture-menu-btn">Capture Screen</button>
@@ -44,12 +43,12 @@
             <div class="chat-history" id="chat-history">
                 <!-- Chat bubbles will go here -->
             </div>
-            <div class="quick-actions" aria-label="Quick actions">
+            <!-- <div class="quick-actions" aria-label="Quick actions">
                 <button data-prompt="Explain this clearly and include a simple example:">Explain</button>
                 <button data-prompt="Summarize the key points of this:">Summarize</button>
                 <button data-prompt="Improve this and suggest a better version:">Improve</button>
                 <button data-prompt="Brainstorm practical ideas for this:">Brainstorm</button>
-            </div>
+            </div> -->
             <div class="input-container">
                 <textarea id="chat-input" placeholder="Message your assistant..." rows="1"></textarea>
                 <span class="input-hint">Enter to send</span>
