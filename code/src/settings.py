@@ -183,6 +183,11 @@ def validate(partial: dict, current: dict = None) -> dict:
     _normalize_hotkeys(partial)
     errors = _collect_errors(partial, RULES)
 
+    # Checked on save only, so a missing default path never breaks loading
+    tesseract = partial.get("tesseract_cmd")
+    if "tesseract_cmd" not in errors and isinstance(tesseract, str) and not os.path.isfile(tesseract):
+        errors["tesseract_cmd"] = "File not found"
+
     merged = _deep_merge(current or load_settings(), partial)
     capture = merged["capture"]
     if capture["capture_hotkey"] == capture["exit_hotkey"]:

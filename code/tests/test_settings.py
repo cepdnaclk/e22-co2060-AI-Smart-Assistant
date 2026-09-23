@@ -82,6 +82,15 @@ class SettingsTestCase(unittest.TestCase):
         errors = settings.validate({"capture": {"capture_hotkey": "ctrl+a+b"}})
         self.assertIn("capture.capture_hotkey", errors)
 
+    def test_validate_rejects_missing_tesseract_file(self):
+        errors = settings.validate({"tesseract_cmd": os.path.join(self.tmp_dir.name, "nope.exe")})
+        self.assertEqual(errors.get("tesseract_cmd"), "File not found")
+
+    def test_validate_accepts_existing_tesseract_file(self):
+        exe = os.path.join(self.tmp_dir.name, "tesseract.exe")
+        open(exe, "w").close()
+        self.assertEqual(settings.validate({"tesseract_cmd": exe}), {})
+
     # -------------------------- save / reset --------------------------
     def test_save_round_trip(self):
         saved, errors = settings.save_settings({"model": {"model": "llama3"}, "general": {"theme": "light"}})

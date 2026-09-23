@@ -946,6 +946,15 @@ label.settings-item {
     gap: 8px;
 }
 
+.select-row .text-input {
+    flex: 1;
+    min-width: 0;
+}
+
+.select-row .settings-btn {
+    flex-shrink: 0;
+}
+
 .select-input {
     flex-grow: 1;
     min-width: 0;
@@ -1016,6 +1025,65 @@ label.settings-item {
 .select-input:focus-visible {
     outline: 2px solid var(--accent-color);
     outline-offset: 2px;
+}
+
+/* Hotkey recorder */
+.hotkey-recorder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    gap: 3px;
+    min-width: 132px;
+    min-height: 30px;
+    padding: 4px 8px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.hotkey-recorder:hover {
+    border-color: var(--accent-color);
+}
+
+.hotkey-recorder:focus-visible {
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+
+.hotkey-recorder.recording {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--hover-bg);
+}
+
+.hotkey-recorder.invalid {
+    border-color: var(--close-color);
+}
+
+.hotkey-recorder kbd {
+    padding: 2px 6px;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-bottom-width: 2px;
+    border-radius: 5px;
+    color: var(--text-color);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.hotkey-hint {
+    color: var(--accent-color);
+    font-size: 11px;
+    animation: blink 1.2s ease-in-out infinite;
+}
+
+.hotkey-hint.error {
+    color: var(--close-color);
+    animation: none;
 }
 
 /* Status lines */

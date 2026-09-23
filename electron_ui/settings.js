@@ -63,9 +63,15 @@
         return state.settings ? state.settings[section] : null;
     }
 
+    // "section.key" -> [section, key]; a top-level key like "tesseract_cmd" -> [null, key]
+    function splitPath(path) {
+        const dot = path.indexOf('.');
+        return dot === -1 ? [null, path] : [path.slice(0, dot), path.slice(dot + 1)];
+    }
+
     function getSetting(path) {
-        const [section, key] = path.split('.');
-        const source = getSource(section);
+        const [section, key] = splitPath(path);
+        const source = section ? getSource(section) : state.settings;
         return source ? source[key] : undefined;
     }
 
@@ -132,6 +138,8 @@
             const invert = Number(control.dataset.invert);
             control.value = invert ? invert - value : value;
             updateSliderFill(control);
+        } else if (control.classList.contains('hotkey-recorder')) {
+            if (control !== recordingControl) renderHotkey(control, value);
         } else if (control.tagName === 'SELECT') {
             // Keep the saved value selectable even before the option list is loaded
             if (value != null && ![...control.options].some((opt) => opt.value === value)) {
@@ -149,6 +157,102 @@
             label.textContent = formatValue(value, label.dataset.format);
         });
     }
+
+    // -------------------------- Hotkey recorder --------------------------
+    // Hotkeys use the Python "keyboard" library format: "ctrl+alt+shift+o"
+    const MODIFIER_KEYS = new Set(['Control', 'Alt', 'Shift', 'Meta']);
+    const HOTKEY_LABELS = { ctrl: 'Ctrl', alt: 'Alt', shift: 'Shift', windows: 'Win' };
+    let recordingControl = null;
+
+    function renderHotkey(control, hotkey) {
+        control.innerHTML = '';
+        (hotkey || '').split('+').filter(Boolean).forEach((part) => {
+            const kbd = document.createElement('kbd');
+            kbd.textContent = HOTKEY_LABELS[part] || part.toUpperCase();
+            control.appendChild(kbd);
+        });
+    }
+
+    function showRecorderHint(control, text, isError = false) {
+        control.innerHTML = '';
+        const hint = document.createElement('span');
+        hint.className = `hotkey-hint${isError ? ' error' : ''}`;
+        hint.textContent = text;
+        control.appendChild(hint);
+    }
+
+    // KeyboardEvent.code -> keyboard-library key name (letters, digits, F-keys and a few named keys)
+    function keyName(code) {
+        let match = /^Key([A-Z])$/.exec(code) || /^Digit([0-9])$/.exec(code) || /^(F[0-9]{1,2})$/.exec(code);
+        if (match) return match[1].toLowerCase();
+        const named = { Space: 'space', Enter: 'enter', Tab: 'tab', Home: 'home', End: 'end', Insert: 'insert', Delete: 'delete' };
+        return named[code] || null;
+    }
+
+    function startRecording(control) {
+        if (recordingControl) stopRecording();
+        recordingControl = control;
+        control.classList.add('recording');
+        clearFieldError(control);
+        showRecorderHint(control, 'Press keys…');
+        sendAction('pause_hotkeys');   // so pressing the current combo doesn't capture/exit
+    }
+
+    function stopRecording() {
+        const control = recordingControl;
+        if (!control) return;
+        recordingControl = null;
+        control.classList.remove('recording');
+        renderHotkey(control, getSetting(control.dataset.setting));
+        sendAction('resume_hotkeys');
+    }
+
+    // Capture phase so the panel's Esc handler doesn't also run while recording
+    document.addEventListener('keydown', (e) => {
+        const control = recordingControl;
+        if (!control) return;
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const modifiers = [];
+        if (e.ctrlKey) modifiers.push('ctrl');
+        if (e.altKey) modifiers.push('alt');
+        if (e.shiftKey) modifiers.push('shift');
+        if (e.metaKey) modifiers.push('windows');
+
+        if (e.key === 'Escape' && !modifiers.length) {
+            stopRecording();
+            return;
+        }
+        if (MODIFIER_KEYS.has(e.key)) {
+            renderHotkey(control, modifiers.join('+'));   // live preview of held modifiers
+            return;
+        }
+        const key = keyName(e.code);
+        if (!key) {
+            showRecorderHint(control, 'Use a letter, number or F-key', true);
+            return;
+        }
+        if (!modifiers.length) {
+            showRecorderHint(control, 'Add Ctrl, Alt or Shift', true);
+            return;
+        }
+
+        const hotkey = [...modifiers, key].join('+');
+        const path = control.dataset.setting;
+        const otherPath = path === 'capture.capture_hotkey' ? 'capture.exit_hotkey' : 'capture.capture_hotkey';
+        if (getSetting(otherPath) === hotkey) {
+            showRecorderHint(control, `Already used by ${fieldLabel(otherPath)}`, true);
+            return;
+        }
+
+        recordingControl = null;
+        control.classList.remove('recording');
+        renderHotkey(control, hotkey);
+        if (hotkey !== getSetting(path)) changeSetting(path, hotkey);
+        // Sent after the save on the same socket, so it runs after it (even if the save is rejected)
+        sendAction('resume_hotkeys');
+    }, true);
 
     function readSliderValue(control) {
         const invert = Number(control.dataset.invert);
@@ -181,8 +285,8 @@
 
     // Update local state immediately (instant preview), then save to the backend
     function changeSetting(path, value, delay = 0) {
-        const [section, key] = path.split('.');
-        const source = getSource(section);
+        const [section, key] = splitPath(path);
+        const source = section ? getSource(section) : state.settings;
         if (!source) return;
         source[key] = value;
         if (section === 'general') applyUiSettings(state.settings.general);
@@ -192,7 +296,7 @@
         const send = () => {
             delete saveTimers[path];
             if (section === 'profile') saveProfile({ [key]: value });
-            else save(section, { [key]: value });
+            else save(section, { [key]: value });   // section null -> top-level key
         };
         if (delay) saveTimers[path] = setTimeout(send, delay);
         else send();
@@ -201,7 +305,7 @@
     // Keep values the user is still dragging when a (older) reply arrives
     function keepPendingValues() {
         Object.keys(saveTimers).forEach((path) => {
-            const [section, key] = path.split('.');
+            const [section, key] = splitPath(path);
             const control = panel.querySelector(`[data-setting="${path}"]`);
             if (control && control.type === 'range') state.settings[section][key] = readSliderValue(control);
         });
@@ -232,6 +336,14 @@
                 });
                 changeSetting(path, value, SLIDER_SAVE_DELAY);
             });
+        } else if (control.classList.contains('hotkey-recorder')) {
+            control.addEventListener('click', () => {
+                if (recordingControl === control) stopRecording();
+                else startRecording(control);
+            });
+            control.addEventListener('blur', () => {
+                if (recordingControl === control) stopRecording();
+            });
         } else if (control.tagName === 'SELECT') {
             control.addEventListener('change', () => changeSetting(path, control.value));
         } else if (isTextControl(control)) {
@@ -259,6 +371,7 @@
 
     // Blur the focused field so its pending 'change' (save) fires before it is hidden
     function commitFocusedField() {
+        if (recordingControl) stopRecording();
         if (panel.contains(document.activeElement) && isTextControl(document.activeElement)) {
             document.activeElement.blur();
         }
@@ -451,6 +564,22 @@
             },
         };
     })();
+
+    // -------------------------- Capture page --------------------------
+    document.getElementById('browse-tesseract-btn').addEventListener('click', async (e) => {
+        e.preventDefault();   // inside a <label>: don't also focus the text field
+        const current = getSetting('tesseract_cmd');
+        const file = await ipcRenderer.invoke('choose-file', {
+            title: 'Select tesseract.exe',
+            defaultPath: current || undefined,
+            filters: [{ name: 'Programs', extensions: ['exe'] }, { name: 'All files', extensions: ['*'] }],
+        });
+        if (!file) return;
+        const input = panel.querySelector('[data-setting="tesseract_cmd"]');
+        clearFieldError(input);
+        input.value = file;
+        changeSetting('tesseract_cmd', file);
+    });
 
     // -------------------------- Public API --------------------------
     window.settingsUI = {

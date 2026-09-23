@@ -355,7 +355,73 @@
                     <p class="settings-footnote">Changes apply to your next message and your next screen capture.</p>
                 </section>
                 <section class="settings-view" data-view="capture" data-title="Capture &amp; Hotkeys">
-                    <p class="settings-empty">Capture and hotkey settings are coming soon.</p>
+                    <h3 class="settings-group-title">Hotkeys</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Capture screen</span>
+                                <span class="settings-item-desc">Select an area to read</span>
+                            </div>
+                            <button class="hotkey-recorder" data-setting="capture.capture_hotkey"
+                                aria-label="Capture screen hotkey. Click to change"></button>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Exit SENTINEL</span>
+                                <span class="settings-item-desc">Close the assistant</span>
+                            </div>
+                            <button class="hotkey-recorder" data-setting="capture.exit_hotkey"
+                                aria-label="Exit hotkey. Click to change"></button>
+                        </div>
+                    </div>
+                    <p class="settings-footnote">Click a shortcut, then press the new key combination. Esc cancels.</p>
+
+                    <h3 class="settings-group-title">Screen reading</h3>
+                    <div class="settings-group">
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Tesseract OCR path</span>
+                            </span>
+                            <span class="select-row">
+                                <input type="text" class="text-input" data-setting="tesseract_cmd" maxlength="500"
+                                    spellcheck="false">
+                                <button class="settings-btn" id="browse-tesseract-btn">Browse…</button>
+                            </span>
+                        </label>
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Copy text to clipboard</span>
+                                <span class="settings-item-desc">Copy what was read after each capture</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="capture.auto_copy"
+                                aria-label="Copy text to clipboard"></button>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Error solutions</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Learn new solutions</span>
+                                <span class="settings-item-desc">Save AI answers for errors SENTINEL hasn't seen before</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="capture.save_ai_solutions"
+                                aria-label="Learn new solutions"></button>
+                        </div>
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Match sensitivity</span>
+                                <span class="settings-value" data-value-for="capture.match_threshold" data-format="percent"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Loose</span>
+                                <input type="range" min="0.4" max="0.9" step="0.05" data-setting="capture.match_threshold"
+                                    aria-label="Match sensitivity">
+                                <span class="slider-end">Strict</span>
+                            </div>
+                            <span class="settings-item-desc">How closely captured text must match a known error before its saved solution is used</span>
+                        </div>
+                    </div>
                 </section>
                 <section class="settings-view" data-view="data" data-title="Data controls">
                     <p class="settings-empty">Data controls are coming soon.</p>

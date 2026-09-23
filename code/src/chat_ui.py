@@ -177,6 +177,12 @@ async def websocket_endpoint(websocket: WebSocket):
                 await websocket.send_text(json.dumps(reply))
                 continue
 
+            if isinstance(request, dict) and request.get("action") in ("pause_hotkeys", "resume_hotkeys"):
+                # Settings page is recording a hotkey: stop the global hotkeys from firing meanwhile
+                if global_control_queue:
+                    global_control_queue.put({"action": request["action"]})
+                continue
+
             if isinstance(request, dict) and request.get("action") == "capture":
                 if global_control_queue:
                     global_control_queue.put({"action": "capture"})
@@ -200,6 +206,9 @@ async def websocket_endpoint(websocket: WebSocket):
             await manager.broadcast({"sender": "system", "text": ai_reply})
     except WebSocketDisconnect:
         manager.disconnect(websocket)
+        # Never leave hotkeys paused if the window goes away mid-recording
+        if global_control_queue:
+            global_control_queue.put({"action": "resume_hotkeys"})
         # Clear the memory when the chat UI window is closed
         chatbot.clear_history()
 

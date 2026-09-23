@@ -278,6 +278,14 @@ def main():
                     trigger_capture()
                 elif control_message.get("action") == "settings_updated":
                     apply_settings(rebuild=control_message.get("rebuild_index", False))
+                elif control_message.get("action") == "pause_hotkeys":
+                    # The settings page is recording a new hotkey; don't trigger capture/exit meanwhile
+                    keyboard.unhook_all_hotkeys()
+                    print("[Settings] Hotkeys paused while recording.")
+                elif control_message.get("action") == "resume_hotkeys":
+                    keyboard.unhook_all_hotkeys()
+                    setup_hotkey()
+                    print("[Settings] Hotkeys resumed.")
         except queue.Empty:
             pass
 
