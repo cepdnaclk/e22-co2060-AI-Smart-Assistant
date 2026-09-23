@@ -102,7 +102,14 @@ function formatTime() {
     return `${hours}:${minutes} ${ampm}`;
 }
 
-function typeWriter(bubble, text, speed = 18) {
+function typingPrefs() {
+    const general = window.settingsUI && settingsUI.state.settings && settingsUI.state.settings.general;
+    return general
+        ? { enabled: general.typing_animation, speed: general.typing_speed }
+        : { enabled: true, speed: 18 };
+}
+
+function typeWriter(bubble, text, speed = typingPrefs().speed) {
     let i = 0;
     bubble.innerHTML = '<span class="cursor">|</span>';
     const cursor = bubble.querySelector('.cursor');
@@ -161,9 +168,13 @@ function addMessage(text, sender) {
         chatHistory.appendChild(row);
         chatHistory.scrollTop = chatHistory.scrollHeight;
 
-        setTimeout(() => {
-            typeWriter(bubble, text);
-        }, 600);
+        if (typingPrefs().enabled) {
+            setTimeout(() => {
+                typeWriter(bubble, text);
+            }, 600);
+        } else {
+            bubble.innerText = text;
+        }
     }
 
     chatHistory.scrollTop = chatHistory.scrollHeight;

@@ -138,7 +138,77 @@
 
                 <!-- Section pages (filled in by later steps) -->
                 <section class="settings-view" data-view="general" data-title="General">
-                    <p class="settings-empty">General settings are coming in the next step.</p>
+                    <h3 class="settings-group-title">Appearance</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Theme</span>
+                            </div>
+                            <div class="segmented" data-setting="general.theme" role="radiogroup" aria-label="Theme">
+                                <button data-value="dark" role="radio">Dark</button>
+                                <button data-value="light" role="radio">Light</button>
+                                <button data-value="system" role="radio">System</button>
+                            </div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Chat text size</span>
+                            </div>
+                            <div class="segmented" data-setting="general.font_size" role="radiogroup" aria-label="Chat text size">
+                                <button data-value="small" role="radio" title="Small"><span style="font-size:10px">A</span></button>
+                                <button data-value="medium" role="radio" title="Medium"><span style="font-size:12px">A</span></button>
+                                <button data-value="large" role="radio" title="Large"><span style="font-size:15px">A</span></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Chat</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Typing animation</span>
+                                <span class="settings-item-desc">Reveal replies letter by letter</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="general.typing_animation"
+                                aria-label="Typing animation"></button>
+                        </div>
+                        <div class="settings-item column" data-depends="general.typing_animation">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Typing speed</span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Slow</span>
+                                <!-- Stored value is ms per character (5 fast – 60 slow); slider is inverted so right = faster -->
+                                <input type="range" min="5" max="60" step="1" data-setting="general.typing_speed"
+                                    data-invert="65" aria-label="Typing speed">
+                                <span class="slider-end">Fast</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Window</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Always on top</span>
+                                <span class="settings-item-desc">Keep SENTINEL above other windows</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="general.always_on_top"
+                                aria-label="Always on top"></button>
+                        </div>
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Background opacity</span>
+                                <span class="settings-value" data-value-for="general.window_opacity" data-format="percent"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">60%</span>
+                                <input type="range" min="0.6" max="1" step="0.05" data-setting="general.window_opacity"
+                                    aria-label="Background opacity">
+                                <span class="slider-end">100%</span>
+                            </div>
+                        </div>
+                    </div>
                 </section>
                 <section class="settings-view" data-view="personalization" data-title="Personalization">
                     <p class="settings-empty">Personalization settings are coming soon.</p>

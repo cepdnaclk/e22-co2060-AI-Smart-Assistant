@@ -72,6 +72,12 @@ ipcMain.on('minimize-window', (event) => {
         win.minimize();
     }
 });
+ipcMain.on('set-always-on-top', (event, enabled) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win && win.isAlwaysOnTop() !== Boolean(enabled)) {
+        win.setAlwaysOnTop(Boolean(enabled));
+    }
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
