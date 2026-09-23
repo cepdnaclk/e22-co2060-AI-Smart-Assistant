@@ -7,6 +7,10 @@ from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from src.ai_module.client import MistralClient
+from src.ai_module import client as ai_client  # unpatched client for settings (MistralClient is monkey-patched)
+from src.ai_module.rag import delete_ai_generated
+from src.memory.user_profile import load_profile, save_profile, validate_profile
+from src.settings import load_settings, save_settings, reset_settings
 
 app = FastAPI()
 
@@ -39,6 +43,88 @@ class ConnectionManager:
                 self.disconnect(connection)
 
 manager = ConnectionManager()
+
+# -------------------------- Settings API --------------------------
+SETTINGS_ACTIONS = {
+    "get_settings", "save_settings", "save_profile", "reset_settings",
+    "list_models", "test_connection", "delete_learned_solutions",
+}
+
+def _notify_main_process(rebuild_index=False):
+    """Tell main.py to reload settings (hotkeys, OCR) and optionally rebuild the RAG index."""
+    if global_control_queue:
+        global_control_queue.put({"action": "settings_updated", "rebuild_index": rebuild_index})
+
+def _settings_snapshot(action: str) -> dict:
+    return {"action": action, "settings": load_settings(), "profile": load_profile()}
+
+def _optional_client(request: dict) -> "ai_client.MistralClient":
+    """Client for the URL/model in the request (to test before saving), else from settings."""
+    url = request.get("url")
+    model = request.get("model")
+    return ai_client.MistralClient(
+        base_url=url if isinstance(url, str) and url else None,
+        model=model if isinstance(model, str) and model else None,
+    )
+
+def handle_settings_action(request: dict) -> dict:
+    """Handle one settings request from the UI. Runs in a worker thread (blocking I/O)."""
+    from src.chatbot_intergrate import chatbot
+    action = request.get("action")
+    try:
+        if action == "get_settings":
+            return _settings_snapshot("settings")
+
+        if action == "save_settings":
+            values = request.get("values")
+            section = request.get("section")
+            if not isinstance(values, dict):
+                return {"action": "settings_error", "errors": {"request": "'values' must be an object"}}
+            _, errors = save_settings({section: values} if section else values)
+            if errors:
+                return {"action": "settings_error", "errors": errors}
+            chatbot.refresh_settings()
+            _notify_main_process()
+            return _settings_snapshot("settings_saved")
+
+        if action == "save_profile":
+            values = request.get("values")
+            if not isinstance(values, dict):
+                return {"action": "settings_error", "errors": {"request": "'values' must be an object"}}
+            errors = validate_profile(values)
+            if errors:
+                return {"action": "settings_error", "errors": {f"profile.{k}": v for k, v in errors.items()}}
+            profile = load_profile()
+            profile.update(values)
+            save_profile(profile)
+            chatbot.refresh_settings()
+            return _settings_snapshot("settings_saved")
+
+        if action == "reset_settings":
+            reset_settings()
+            chatbot.refresh_settings()
+            _notify_main_process()
+            return _settings_snapshot("settings_saved")
+
+        if action == "list_models":
+            result = _optional_client(request).list_models()
+            return {"action": "models", "models": result["models"], "error": result["error"]}
+
+        if action == "test_connection":
+            result = _optional_client(request).ping()
+            return {"action": "connection_result", "ok": result["ok"], "detail": result["detail"]}
+
+        if action == "delete_learned_solutions":
+            removed = delete_ai_generated()
+            if removed:
+                _notify_main_process(rebuild_index=True)
+            return {"action": "learned_solutions_deleted", "removed": removed}
+
+    except Exception as e:
+        print(f"Settings action '{action}' failed: {e}")
+        return {"action": "settings_error", "errors": {"request": str(e)}}
+
+    return {"action": "settings_error", "errors": {"request": f"Unknown action: {action}"}}
 
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
@@ -82,6 +168,13 @@ async def websocket_endpoint(websocket: WebSocket):
             if isinstance(request, dict) and request.get("action") == "clear_history":
                 chatbot.clear_history()
                 await manager.broadcast({"action": "clear"})
+                continue
+
+            if isinstance(request, dict) and request.get("action") in SETTINGS_ACTIONS:
+                # Reply only to the window that asked; don't broadcast
+                loop = asyncio.get_event_loop()
+                reply = await loop.run_in_executor(None, handle_settings_action, request)
+                await websocket.send_text(json.dumps(reply))
                 continue
 
             if isinstance(request, dict) and request.get("action") == "capture":

@@ -11,7 +11,7 @@ import ctypes
 import multiprocessing
 import queue
 import socket
-from src.ai_module.rag import rag_query, build_faiss_index, cache_suggestion
+from src.ai_module.rag import rag_query, build_faiss_index, cache_suggestion, rebuild_index
 import subprocess
 
 from src.ocr_module.overlay import RegionSelection
@@ -202,6 +202,27 @@ def setup_hotkey():
         keyboard.add_hotkey(exit_hotkey, exit_app_hotkey)
     return capture_hotkey, exit_hotkey
 
+def apply_settings(rebuild=False):
+    """Apply settings saved from the UI: re-register hotkeys, reload OCR, rebuild RAG index."""
+    global ocr, TESSERACT_CMD
+    settings = load_settings()
+
+    keyboard.unhook_all_hotkeys()
+    capture_hotkey, exit_hotkey = setup_hotkey()
+    print(f"[Settings] Applied. Capture: {capture_hotkey} | Exit: {exit_hotkey}")
+
+    if settings["tesseract_cmd"] != TESSERACT_CMD:
+        try:
+            ocr = OCREngine(settings["tesseract_cmd"])
+            TESSERACT_CMD = settings["tesseract_cmd"]
+            print(f"[Settings] OCR now uses {TESSERACT_CMD}")
+        except Exception as e:
+            print(f"[Settings] Could not load Tesseract, keeping previous one: {e}")
+
+    if rebuild:
+        threading.Thread(target=rebuild_index, daemon=True, name="faiss-index-rebuilder").start()
+        print("[RAG] Rebuilding FAISS index in background...")
+
 def start_tray_icon():
     global icon
     icon = pystray.Icon("OCR Tool")
@@ -255,6 +276,8 @@ def main():
                 control_message = capture_control_queue.get_nowait()
                 if control_message.get("action") == "capture":
                     trigger_capture()
+                elif control_message.get("action") == "settings_updated":
+                    apply_settings(rebuild=control_message.get("rebuild_index", False))
         except queue.Empty:
             pass
 
