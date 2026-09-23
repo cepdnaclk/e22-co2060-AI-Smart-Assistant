@@ -19,7 +19,7 @@ from src.ocr_module.engine import OCREngine
 from src.automation.comms import copy_to_clipboard
 from src.ai_module.client import MistralClient
 from src import chat_ui  # Tkinter chat window module
-from src.settings import load_settings
+from src.settings import load_settings, DEFAULTS
 
 # -------------------------- DPI Awareness --------------------------
 try:
@@ -62,7 +62,7 @@ def load_db() -> dict:
         raw = json.load(f)
     return {k.lower(): v for k, v in raw.items()}
 
-def find_error_solution(text: str):
+def find_error_solution(text: str, threshold: float = 0.6):
     db = load_db()
     normalized = normalize_text(text)
 
@@ -72,7 +72,7 @@ def find_error_solution(text: str):
             print(f"✅ Exact match: {key}")
             return value
         ratio = difflib.SequenceMatcher(None, key, normalized).ratio()
-        if ratio > 0.6:
+        if ratio > threshold:
             print(f"🤏 Fuzzy match: {key} (score {ratio:.2f})")
             return value
     print("❌ No match found")
@@ -119,6 +119,7 @@ def trigger_capture():
 def run_capture_logic():
     global is_processing
     print("Hotkey triggered!")
+    capture_settings = load_settings()["capture"]
     try:
         time.sleep(0.4)
         region_selector = RegionSelection()
@@ -133,13 +134,14 @@ def run_capture_logic():
             return
 
         print(f"Extracted Text: {text}")
-        copy_to_clipboard(text)
+        if capture_settings["auto_copy"]:
+            copy_to_clipboard(text)
 
         if chat_queue:
             chat_queue.put({"sender": "system", "text": f"OCR Input: {text}", "role": "user"})
 
         # --- DB + RAG logic ---
-        solution = find_error_solution(text)
+        solution = find_error_solution(text, capture_settings["match_threshold"])
         suggestion = None
 
         if solution:
@@ -164,7 +166,9 @@ def run_capture_logic():
             and suggestion
             and not suggestion.startswith("⚠️")
         )
-        if is_real_suggestion:
+        if is_real_suggestion and not capture_settings["save_ai_solutions"]:
+            print("[DB] Learning new solutions is turned off. Not saving.")
+        elif is_real_suggestion:
             print(f"[DB] Saving new entry to errors_db.json...")
             cache_suggestion(text, suggestion)
             print(f"[DB] Saved successfully.")
@@ -181,8 +185,22 @@ def run_capture_logic():
 
 # -------------------------- Hotkeys & Tray --------------------------
 def setup_hotkey():
-    keyboard.add_hotkey('ctrl+alt+shift+o', trigger_capture)
-    keyboard.add_hotkey('ctrl+alt+shift+p', exit_app_hotkey)
+    """Register the capture/exit hotkeys from settings. Returns (capture, exit) actually in use."""
+    capture_settings = load_settings()["capture"]
+    capture_hotkey = capture_settings["capture_hotkey"]
+    exit_hotkey = capture_settings["exit_hotkey"]
+    try:
+        keyboard.add_hotkey(capture_hotkey, trigger_capture)
+        keyboard.add_hotkey(exit_hotkey, exit_app_hotkey)
+    except ValueError as e:
+        # The keyboard library rejected a key name; fall back to the defaults
+        print(f"Invalid hotkey in settings ({e}). Using defaults.")
+        keyboard.unhook_all_hotkeys()
+        capture_hotkey = DEFAULTS["capture"]["capture_hotkey"]
+        exit_hotkey = DEFAULTS["capture"]["exit_hotkey"]
+        keyboard.add_hotkey(capture_hotkey, trigger_capture)
+        keyboard.add_hotkey(exit_hotkey, exit_app_hotkey)
+    return capture_hotkey, exit_hotkey
 
 def start_tray_icon():
     global icon
@@ -202,9 +220,9 @@ def main():
     global chat_queue
     global electron_process
 
-    setup_hotkey()
+    capture_hotkey, exit_hotkey = setup_hotkey()
     print("Background OCR Service Running...")
-    print("Capture: Ctrl+Alt+Shift+O | Exit: Ctrl+Alt+Shift+P")
+    print(f"Capture: {capture_hotkey} | Exit: {exit_hotkey}")
 
     # --- Build FAISS index in background so startup is not blocked ---
     faiss_thread = threading.Thread(target=build_faiss_index, daemon=True, name="faiss-index-builder")
