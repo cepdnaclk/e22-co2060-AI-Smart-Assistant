@@ -279,7 +279,80 @@
                     <p class="settings-footnote">Changes apply to your next message. The current chat is kept.</p>
                 </section>
                 <section class="settings-view" data-view="model" data-title="Model">
-                    <p class="settings-empty">Model settings are coming soon.</p>
+                    <h3 class="settings-group-title">Provider</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Provider</span>
+                            </div>
+                            <div class="segmented" data-setting="model.provider" role="radiogroup" aria-label="Provider">
+                                <button data-value="ollama" role="radio">Ollama (local)</button>
+                                <button data-value="azure" role="radio" disabled title="Coming soon">Azure</button>
+                            </div>
+                        </div>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Ollama URL</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="model.ollama_url" maxlength="200"
+                                placeholder="http://127.0.0.1:11434" spellcheck="false">
+                        </label>
+                    </div>
+
+                    <h3 class="settings-group-title">Model</h3>
+                    <div class="settings-group">
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Model</span>
+                                <span class="settings-item-desc">Models installed in Ollama</span>
+                            </div>
+                            <div class="select-row">
+                                <select class="select-input" data-setting="model.model" aria-label="Model"></select>
+                                <button class="settings-icon-btn outlined" id="refresh-models-btn" title="Refresh model list"
+                                    aria-label="Refresh model list">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+                                        <path d="M21 3v5h-5" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <span class="settings-status" id="models-status" aria-live="polite"></span>
+                        </div>
+                        <div class="settings-item column">
+                            <button class="settings-btn" id="test-connection-btn">Test connection</button>
+                            <span class="connection-result" id="connection-result" aria-live="polite"></span>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Response</h3>
+                    <div class="settings-group">
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Temperature</span>
+                                <span class="settings-value" data-value-for="model.temperature" data-format="decimal"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Precise</span>
+                                <input type="range" min="0" max="1.5" step="0.1" data-setting="model.temperature"
+                                    aria-label="Temperature">
+                                <span class="slider-end">Creative</span>
+                            </div>
+                        </div>
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Max response length</span>
+                                <span class="settings-value" data-value-for="model.max_tokens" data-format="tokens"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Short</span>
+                                <input type="range" min="128" max="4096" step="128" data-setting="model.max_tokens"
+                                    aria-label="Max response length">
+                                <span class="slider-end">Long</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="settings-footnote">Changes apply to your next message and your next screen capture.</p>
                 </section>
                 <section class="settings-view" data-view="capture" data-title="Capture &amp; Hotkeys">
                     <p class="settings-empty">Capture and hotkey settings are coming soon.</p>

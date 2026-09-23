@@ -19,7 +19,8 @@ DEFAULTS = {
     },
     "model": {
         "provider": "ollama",
-        "ollama_url": "http://localhost:11434",
+        # 127.0.0.1, not localhost: on Windows "localhost" tries IPv6 first and adds ~2s per request
+        "ollama_url": "http://127.0.0.1:11434",
         "model": "mistral",
         "temperature": 0.7,
         "max_tokens": 512,

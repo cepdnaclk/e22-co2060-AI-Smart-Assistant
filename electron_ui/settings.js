@@ -113,7 +113,10 @@
     }
 
     function formatValue(value, format) {
-        return format === 'percent' ? `${Math.round(value * 100)}%` : String(value);
+        if (format === 'percent') return `${Math.round(value * 100)}%`;
+        if (format === 'decimal') return Number(value).toFixed(1);
+        if (format === 'tokens') return `${value} tokens`;
+        return String(value);
     }
 
     function setControlValue(control, value) {
@@ -129,6 +132,12 @@
             const invert = Number(control.dataset.invert);
             control.value = invert ? invert - value : value;
             updateSliderFill(control);
+        } else if (control.tagName === 'SELECT') {
+            // Keep the saved value selectable even before the option list is loaded
+            if (value != null && ![...control.options].some((opt) => opt.value === value)) {
+                control.add(new Option(value, value));
+            }
+            control.value = value;
         } else if (isTextControl(control)) {
             // Don't overwrite what the user is typing, or a rejected value they still need to fix
             if (document.activeElement !== control && !control.classList.contains('invalid')) {
@@ -223,6 +232,8 @@
                 });
                 changeSetting(path, value, SLIDER_SAVE_DELAY);
             });
+        } else if (control.tagName === 'SELECT') {
+            control.addEventListener('change', () => changeSetting(path, control.value));
         } else if (isTextControl(control)) {
             control.addEventListener('input', () => {
                 clearFieldError(control);
@@ -265,7 +276,10 @@
         backBtn.classList.toggle('hidden', name === 'list');
         active.scrollTop = 0;
         renderControls(active);
-        if (name !== 'list' && pages[name] && state.settings) pages[name].render(state);
+        if (name !== 'list' && pages[name]) {
+            if (pages[name].onShow) pages[name].onShow(state);
+            if (pages[name].render && state.settings) pages[name].render(state);
+        }
     }
 
     function open() {
@@ -342,7 +356,7 @@
             applyUiSettings(state.settings.general);
             renderControls(panel);
             Object.values(pages).forEach((page) => page.onSettings && page.onSettings(state));
-            if (currentView !== 'list' && pages[currentView]) pages[currentView].render(state);
+            if (currentView !== 'list' && pages[currentView] && pages[currentView].render) pages[currentView].render(state);
             if (data.action === 'settings_saved') showToast('✓ Saved');
         } else if (data.action === 'settings_error') {
             const messages = Object.entries(data.errors || {}).map(([field, msg]) => `${fieldLabel(field)}: ${msg}`);
@@ -354,6 +368,89 @@
         }
         Object.values(pages).forEach((page) => page.onMessage && page.onMessage(data));
     }
+
+    // -------------------------- Model page --------------------------
+    (() => {
+        const modelSelect = panel.querySelector('[data-setting="model.model"]');
+        const refreshBtn = document.getElementById('refresh-models-btn');
+        const modelsStatus = document.getElementById('models-status');
+        const testBtn = document.getElementById('test-connection-btn');
+        const testResult = document.getElementById('connection-result');
+        let modelsUrl = null;   // URL the current model list was loaded from
+
+        function setStatus(el, text, type = '') {
+            el.textContent = text;
+            el.className = `${el.id === 'connection-result' ? 'connection-result' : 'settings-status'} ${type}`;
+        }
+
+        function requestModels() {
+            modelsUrl = getSetting('model.ollama_url');
+            if (!sendAction('list_models')) {
+                setStatus(modelsStatus, 'Not connected to SENTINEL yet.', 'error');
+                return;
+            }
+            refreshBtn.disabled = true;
+            refreshBtn.classList.add('spinning');
+            setStatus(modelsStatus, 'Loading models…');
+        }
+
+        function showModels(models, error) {
+            refreshBtn.disabled = false;
+            refreshBtn.classList.remove('spinning');
+            if (error) {
+                setStatus(modelsStatus, error, 'error');
+                return;
+            }
+            // "mistral:latest" -> "mistral" (Ollama treats them the same)
+            const names = [...new Set(models.map((name) => name.replace(/:latest$/, '')))];
+            const current = getSetting('model.model');
+            modelSelect.innerHTML = '';
+            names.forEach((name) => modelSelect.add(new Option(name, name)));
+            if (current && !names.includes(current)) {
+                modelSelect.add(new Option(`${current} (not installed)`, current));
+            }
+            modelSelect.value = current;
+            setStatus(modelsStatus, names.length
+                ? `${names.length} model${names.length === 1 ? '' : 's'} installed`
+                : 'No models installed. Run: ollama pull mistral', names.length ? '' : 'error');
+        }
+
+        refreshBtn.addEventListener('click', requestModels);
+
+        testBtn.addEventListener('click', () => {
+            commitFocusedField();
+            const request = { url: getSetting('model.ollama_url'), model: getSetting('model.model') };
+            if (!sendAction('test_connection', request)) {
+                setStatus(testResult, 'Not connected to SENTINEL yet.', 'fail');
+                return;
+            }
+            testBtn.disabled = true;
+            testBtn.textContent = 'Testing…';
+            setStatus(testResult, '');
+        });
+
+        pages.model = {
+            onShow: () => {
+                setStatus(testResult, '');
+                if (state.settings) requestModels();
+            },
+            onSettings: () => {
+                // Reload the list when the URL was changed and saved
+                if (currentView === 'model' && modelsUrl !== null && getSetting('model.ollama_url') !== modelsUrl) {
+                    requestModels();
+                }
+            },
+            onMessage: (data) => {
+                if (data.action === 'models') {
+                    showModels(data.models || [], data.error);
+                } else if (data.action === 'connection_result') {
+                    testBtn.disabled = false;
+                    testBtn.textContent = 'Test connection';
+                    setStatus(testResult, data.detail, data.ok ? 'ok' : 'fail');
+                }
+            },
+        };
+    })();
 
     // -------------------------- Public API --------------------------
     window.settingsUI = {
