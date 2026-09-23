@@ -28,11 +28,17 @@ function connectWebSocket() {
             statusDot.className = 'status-dot online';
             connectionStatus.textContent = 'Online';
         console.log(`Connected to WebSocket server on port ${chatPort}`);
+        sendAction('get_settings');
     };
 
     ws.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
+
+            if (data.action && window.settingsUI && settingsUI.handles(data.action)) {
+                settingsUI.handleMessage(data);
+                return;
+            }
 
             if (data.action) {
                 if (data.action === 'hide') {
@@ -163,9 +169,9 @@ function addMessage(text, sender) {
     chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
-function sendAction(action) {
+function sendAction(action, extra = {}) {
     if (ws && isConnected && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ action }));
+        ws.send(JSON.stringify({ ...extra, action }));
         return true;
     }
     return false;
@@ -197,7 +203,7 @@ captureMenuBtn.addEventListener('click', () => {
 
 settingsMenuBtn.addEventListener('click', () => {
     menuDropdown.classList.remove('show');
-    addMessage('Settings feature coming soon.', 'system');
+    settingsUI.open();
 });
 
 function regenerateLastResponse() {
