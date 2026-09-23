@@ -715,13 +715,14 @@ body {
     gap: 8px;
 }
 
-.settings-item.column .settings-item-text {
+/* Label and live value on one line (e.g. "Background opacity   80%") */
+.settings-item.column .settings-item-text:has(.settings-value) {
     flex-direction: row;
     justify-content: space-between;
     align-items: baseline;
 }
 
-.settings-item.disabled {
+[data-depends].disabled {
     opacity: 0.45;
 }
 
@@ -860,6 +861,76 @@ input[type="range"]::-webkit-slider-thumb {
     background: #FFFFFF;
     border: 2px solid var(--accent-color);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Text fields */
+.text-input,
+.text-area {
+    width: 100%;
+    padding: 8px 10px;
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 12px;
+    line-height: 1.45;
+    outline: none;
+    user-select: text;
+    transition: border-color 0.15s ease;
+}
+
+.text-area {
+    min-height: 76px;
+    max-height: 220px;
+    resize: vertical;
+}
+
+.text-input::placeholder,
+.text-area::placeholder {
+    color: var(--time-color);
+}
+
+.text-input:focus,
+.text-area:focus {
+    border-color: var(--accent-color);
+}
+
+.text-input.invalid,
+.text-area.invalid,
+.segmented.invalid {
+    border-color: var(--close-color);
+}
+
+.text-input:disabled,
+.text-area:disabled {
+    cursor: not-allowed;
+}
+
+label.settings-item {
+    cursor: default;
+}
+
+.char-count {
+    align-self: flex-end;
+    margin-top: -4px;
+    color: var(--time-color);
+    font-size: 10px;
+    font-variant-numeric: tabular-nums;
+}
+
+.char-count.near-limit {
+    color: var(--warning-color);
+}
+
+.field-error {
+    color: var(--close-color);
+    font-size: 11px;
+}
+
+.settings-footnote {
+    color: var(--time-color);
+    font-size: 11px;
+    margin: 4px 4px 12px;
 }
 
 /* Toast */

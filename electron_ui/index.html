@@ -211,7 +211,72 @@
                     </div>
                 </section>
                 <section class="settings-view" data-view="personalization" data-title="Personalization">
-                    <p class="settings-empty">Personalization settings are coming soon.</p>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Use personalization</span>
+                                <span class="settings-item-desc">Let SENTINEL use your profile and instructions in replies</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="profile.personalization_enabled"
+                                aria-label="Use personalization"></button>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">About you</h3>
+                    <div class="settings-group" data-depends="profile.personalization_enabled">
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Nickname</span>
+                                <span class="settings-item-desc">What should SENTINEL call you?</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="profile.nickname" maxlength="200"
+                                placeholder="e.g. Sooriya" spellcheck="false">
+                        </label>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Full name</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="profile.full_name" maxlength="200"
+                                spellcheck="false">
+                        </label>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Occupation</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="profile.occupation" maxlength="200"
+                                placeholder="e.g. Computer Engineering Undergraduate">
+                        </label>
+                    </div>
+
+                    <h3 class="settings-group-title">Custom instructions</h3>
+                    <div class="settings-group" data-depends="profile.personalization_enabled">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Answer style</span>
+                            </div>
+                            <div class="segmented" data-setting="profile.answer_style" role="radiogroup" aria-label="Answer style">
+                                <button data-value="concise" role="radio">Concise</button>
+                                <button data-value="detailed" role="radio">Detailed</button>
+                            </div>
+                        </div>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">What should SENTINEL know about you?</span>
+                            </span>
+                            <textarea class="text-area" data-setting="profile.about_you" maxlength="1500" rows="4"
+                                placeholder="e.g. I'm a computer engineering student. I mostly use Python and I'm learning FastAPI."></textarea>
+                            <span class="char-count" data-count-for="profile.about_you"></span>
+                        </label>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">How should SENTINEL respond?</span>
+                            </span>
+                            <textarea class="text-area" data-setting="profile.response_style" maxlength="1500" rows="4"
+                                placeholder="e.g. Use bullet points. Explain code step by step. Skip the small talk."></textarea>
+                            <span class="char-count" data-count-for="profile.response_style"></span>
+                        </label>
+                    </div>
+                    <p class="settings-footnote">Changes apply to your next message. The current chat is kept.</p>
                 </section>
                 <section class="settings-view" data-view="model" data-title="Model">
                     <p class="settings-empty">Model settings are coming soon.</p>
