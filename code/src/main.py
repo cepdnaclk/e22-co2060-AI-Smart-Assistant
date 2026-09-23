@@ -19,6 +19,7 @@ from src.ocr_module.engine import OCREngine
 from src.automation.comms import copy_to_clipboard
 from src.ai_module.client import MistralClient
 from src import chat_ui  # Tkinter chat window module
+from src.settings import load_settings
 
 # -------------------------- DPI Awareness --------------------------
 try:
@@ -27,17 +28,10 @@ except Exception:
     ctypes.windll.user32.SetProcessDPIAware()
 
 # -------------------------- Config Paths --------------------------
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
 DB_FILE = os.path.join(os.path.dirname(__file__), 'errors_db.json')
 
-def load_config():
-    if os.path.exists(CONFIG_PATH):
-        with open(CONFIG_PATH, 'r') as f:
-            return json.load(f)
-    return {}
-
-config = load_config()
-TESSERACT_CMD = config.get("tesseract_cmd", r"C:\Program Files\Tesseract-OCR\tesseract.exe")
+settings = load_settings()
+TESSERACT_CMD = settings["tesseract_cmd"]
 
 # -------------------------- Globals --------------------------
 ocr = None
