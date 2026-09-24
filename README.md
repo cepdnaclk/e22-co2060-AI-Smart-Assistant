@@ -46,14 +46,20 @@ For now this use local AI model.
 
 ## How to Run
 
-1. Install dependencies:
+1. **Install Python dependencies:**
+   Navigate to the `code` directory and run:
    ```bash
    pip install -r requirements.txt
    ```
 
-2. Run the application:
-   go to ```bash AI-Smart-Assistant\code``` file.
-   Then
+2. **Install Electron UI dependencies:**
+   Navigate to the `electron_ui` directory and run:
+   ```bash
+   npm install
+   ```
+
+3. **Run the application:**
+   Go to the `code` directory and start the main python script (this will automatically launch the UI as well):
    ```bash
    python -m src.main
    ```

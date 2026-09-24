@@ -2,15 +2,7 @@
   "personalization_enabled": true,
   "answer_style": "concise",
   "about_you": "",
-  "response_style": "i want sexy response",
-  "full_name": "Kavindu Nipun Sooriyabandara",
+  "response_style": "",
   "nickname": "Janith",
-  "occupation": "Computer Engineering Undergraduate",
-  "university": "University of Peradeniya",
-  "preferred_theme": "dark",
-  "favorite_language": "Python",
-  "favorite_colours": [
-    "blue",
-    "black"
-  ]
+  "full_name": "Janith Kahagalla"
 }
