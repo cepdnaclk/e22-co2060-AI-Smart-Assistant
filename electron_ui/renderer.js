@@ -13,6 +13,8 @@ const quickCaptureBtn = document.getElementById('quick-capture-btn');
 const menuDropdown = document.getElementById('menu-dropdown');
 const captureMenuBtn = document.getElementById('capture-menu-btn');
 const settingsMenuBtn = document.getElementById('settings-menu-btn');
+const emptyGreeting = document.getElementById('empty-greeting');
+const greetingName = document.getElementById('greeting-name');
 
 const { ipcRenderer } = require('electron');
 let ws = null;
@@ -29,6 +31,10 @@ function connectWebSocket() {
             connectionStatus.textContent = 'Online';
         console.log(`Connected to WebSocket server on port ${chatPort}`);
         sendAction('get_settings');
+        
+        setTimeout(() => {
+            updateEmptyState();
+        }, 200);
     };
 
     ws.onmessage = (event) => {
@@ -47,6 +53,7 @@ function connectWebSocket() {
                     window.close();
                     } else if (data.action === 'clear') {
                         chatHistory.innerHTML = '';
+                        updateEmptyState();
                     } else if (data.action === 'remove_last_assistant') {
                         const messages = chatHistory.querySelectorAll('.message-row.system:not(#thinking-row)');
                         if (messages.length) messages[messages.length - 1].remove();
@@ -178,6 +185,25 @@ function addMessage(text, sender) {
     }
 
     chatHistory.scrollTop = chatHistory.scrollHeight;
+    updateEmptyState();
+}
+
+function updateEmptyState() {
+    if (chatHistory.children.length === 0) {
+        const profile = window.settingsUI && window.settingsUI.state && window.settingsUI.state.profile;
+        let name = 'there';
+        if (profile) {
+            if (profile.nickname && profile.nickname.trim()) {
+                name = profile.nickname.trim();
+            } else if (profile.full_name && profile.full_name.trim()) {
+                name = profile.full_name.trim().split(' ')[0];
+            }
+        }
+        greetingName.textContent = name;
+        emptyGreeting.classList.add('show');
+    } else {
+        emptyGreeting.classList.remove('show');
+    }
 }
 
 function sendAction(action, extra = {}) {
@@ -265,6 +291,7 @@ newChatMenuBtn.addEventListener('click', () => {
     menuDropdown.classList.remove('show');
     if (sendAction('clear_history')) {
         chatHistory.innerHTML = '';
+        updateEmptyState();
         chatInput.focus();
     }
 });

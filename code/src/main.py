@@ -128,6 +128,8 @@ def run_capture_logic():
             print("Selection cancelled.")
             return
 
+        # Give the OS time to destroy the Tkinter overlay window before capturing the screen
+        time.sleep(0.3)
         text = ocr.capture_and_extract(selection)
         if not text:
             print("No text detected.")
