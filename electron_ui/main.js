@@ -72,6 +72,23 @@ ipcMain.on('minimize-window', (event) => {
         win.minimize();
     }
 });
+ipcMain.handle('choose-file', async (event, options = {}) => {
+    const { dialog } = require('electron');
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const result = await dialog.showOpenDialog(win, {
+        title: options.title || 'Choose a file',
+        defaultPath: options.defaultPath || undefined,
+        filters: options.filters || [],
+        properties: ['openFile'],
+    });
+    return result.canceled ? null : result.filePaths[0];
+});
+ipcMain.on('set-always-on-top', (event, enabled) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win && win.isAlwaysOnTop() !== Boolean(enabled)) {
+        win.setAlwaysOnTop(Boolean(enabled));
+    }
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();

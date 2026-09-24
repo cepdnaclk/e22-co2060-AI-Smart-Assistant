@@ -28,11 +28,17 @@ function connectWebSocket() {
             statusDot.className = 'status-dot online';
             connectionStatus.textContent = 'Online';
         console.log(`Connected to WebSocket server on port ${chatPort}`);
+        sendAction('get_settings');
     };
 
     ws.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
+
+            if (data.action && window.settingsUI && settingsUI.handles(data.action)) {
+                settingsUI.handleMessage(data);
+                return;
+            }
 
             if (data.action) {
                 if (data.action === 'hide') {
@@ -96,7 +102,14 @@ function formatTime() {
     return `${hours}:${minutes} ${ampm}`;
 }
 
-function typeWriter(bubble, text, speed = 18) {
+function typingPrefs() {
+    const general = window.settingsUI && settingsUI.state.settings && settingsUI.state.settings.general;
+    return general
+        ? { enabled: general.typing_animation, speed: general.typing_speed }
+        : { enabled: true, speed: 18 };
+}
+
+function typeWriter(bubble, text, speed = typingPrefs().speed) {
     let i = 0;
     bubble.innerHTML = '<span class="cursor">|</span>';
     const cursor = bubble.querySelector('.cursor');
@@ -155,17 +168,21 @@ function addMessage(text, sender) {
         chatHistory.appendChild(row);
         chatHistory.scrollTop = chatHistory.scrollHeight;
 
-        setTimeout(() => {
-            typeWriter(bubble, text);
-        }, 600);
+        if (typingPrefs().enabled) {
+            setTimeout(() => {
+                typeWriter(bubble, text);
+            }, 600);
+        } else {
+            bubble.innerText = text;
+        }
     }
 
     chatHistory.scrollTop = chatHistory.scrollHeight;
 }
 
-function sendAction(action) {
+function sendAction(action, extra = {}) {
     if (ws && isConnected && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ action }));
+        ws.send(JSON.stringify({ ...extra, action }));
         return true;
     }
     return false;
@@ -197,7 +214,7 @@ captureMenuBtn.addEventListener('click', () => {
 
 settingsMenuBtn.addEventListener('click', () => {
     menuDropdown.classList.remove('show');
-    addMessage('Settings feature coming soon.', 'system');
+    settingsUI.open();
 });
 
 function regenerateLastResponse() {

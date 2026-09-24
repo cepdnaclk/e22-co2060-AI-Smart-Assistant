@@ -55,8 +55,490 @@
                 <button id="send-btn" title="Send message" aria-label="Send message">➤</button>
             </div>
         </div>
+
+        <!-- Settings panel: slides in over the chat -->
+        <div class="settings-panel" id="settings-panel" role="dialog" aria-modal="true"
+            aria-labelledby="settings-title" aria-hidden="true">
+            <div class="settings-header">
+                <button class="settings-icon-btn" id="settings-back-btn" title="Back" aria-label="Back">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 18l-6-6 6-6" />
+                    </svg>
+                </button>
+                <span class="settings-title" id="settings-title">Settings</span>
+                <button class="settings-icon-btn close" id="settings-close-btn" title="Close settings"
+                    aria-label="Close settings">✕</button>
+            </div>
+
+            <div class="settings-body">
+                <!-- Section list -->
+                <nav class="settings-view active" data-view="list" aria-label="Settings sections">
+                    <button class="settings-row" data-open="general">
+                        <span class="settings-row-icon">
+                            <svg viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6" /></svg>
+                        </span>
+                        <span class="settings-row-text">
+                            <span class="settings-row-label">General</span>
+                            <span class="settings-row-desc">Theme, text size and window</span>
+                        </span>
+                        <span class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg></span>
+                    </button>
+                    <button class="settings-row" data-open="personalization">
+                        <span class="settings-row-icon">
+                            <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>
+                        </span>
+                        <span class="settings-row-text">
+                            <span class="settings-row-label">Personalization</span>
+                            <span class="settings-row-desc">Your profile and custom instructions</span>
+                        </span>
+                        <span class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg></span>
+                    </button>
+                    <button class="settings-row" data-open="model">
+                        <span class="settings-row-icon">
+                            <svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2" /><rect x="9" y="9" width="6" height="6" /><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" /></svg>
+                        </span>
+                        <span class="settings-row-text">
+                            <span class="settings-row-label">Model</span>
+                            <span class="settings-row-desc">AI model and response length</span>
+                        </span>
+                        <span class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg></span>
+                    </button>
+                    <button class="settings-row" data-open="capture">
+                        <span class="settings-row-icon">
+                            <svg viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z" /><circle cx="12" cy="13" r="3" /></svg>
+                        </span>
+                        <span class="settings-row-text">
+                            <span class="settings-row-label">Capture &amp; Hotkeys</span>
+                            <span class="settings-row-desc">Shortcuts and screen reading</span>
+                        </span>
+                        <span class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg></span>
+                    </button>
+                    <button class="settings-row" data-open="data">
+                        <span class="settings-row-icon">
+                            <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3" /><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" /><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" /></svg>
+                        </span>
+                        <span class="settings-row-text">
+                            <span class="settings-row-label">Data controls</span>
+                            <span class="settings-row-desc">Chat history and learned solutions</span>
+                        </span>
+                        <span class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg></span>
+                    </button>
+                    <button class="settings-row" data-open="about">
+                        <span class="settings-row-icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></svg>
+                        </span>
+                        <span class="settings-row-text">
+                            <span class="settings-row-label">About</span>
+                            <span class="settings-row-desc">Version and keyboard shortcuts</span>
+                        </span>
+                        <span class="settings-row-chevron"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" /></svg></span>
+                    </button>
+                </nav>
+
+                <!-- Section pages (filled in by later steps) -->
+                <section class="settings-view" data-view="general" data-title="General">
+                    <h3 class="settings-group-title">Appearance</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Theme</span>
+                            </div>
+                            <div class="segmented" data-setting="general.theme" role="radiogroup" aria-label="Theme">
+                                <button data-value="dark" role="radio">Dark</button>
+                                <button data-value="light" role="radio">Light</button>
+                                <button data-value="system" role="radio">System</button>
+                            </div>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Chat text size</span>
+                            </div>
+                            <div class="segmented" data-setting="general.font_size" role="radiogroup" aria-label="Chat text size">
+                                <button data-value="small" role="radio" title="Small"><span style="font-size:10px">A</span></button>
+                                <button data-value="medium" role="radio" title="Medium"><span style="font-size:12px">A</span></button>
+                                <button data-value="large" role="radio" title="Large"><span style="font-size:15px">A</span></button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Chat</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Typing animation</span>
+                                <span class="settings-item-desc">Reveal replies letter by letter</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="general.typing_animation"
+                                aria-label="Typing animation"></button>
+                        </div>
+                        <div class="settings-item column" data-depends="general.typing_animation">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Typing speed</span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Slow</span>
+                                <!-- Stored value is ms per character (5 fast – 60 slow); slider is inverted so right = faster -->
+                                <input type="range" min="5" max="60" step="1" data-setting="general.typing_speed"
+                                    data-invert="65" aria-label="Typing speed">
+                                <span class="slider-end">Fast</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Window</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Always on top</span>
+                                <span class="settings-item-desc">Keep SENTINEL above other windows</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="general.always_on_top"
+                                aria-label="Always on top"></button>
+                        </div>
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Background opacity</span>
+                                <span class="settings-value" data-value-for="general.window_opacity" data-format="percent"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">60%</span>
+                                <input type="range" min="0.6" max="1" step="0.05" data-setting="general.window_opacity"
+                                    aria-label="Background opacity">
+                                <span class="slider-end">100%</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="settings-view" data-view="personalization" data-title="Personalization">
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Use personalization</span>
+                                <span class="settings-item-desc">Let SENTINEL use your profile and instructions in replies</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="profile.personalization_enabled"
+                                aria-label="Use personalization"></button>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">About you</h3>
+                    <div class="settings-group" data-depends="profile.personalization_enabled">
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Nickname</span>
+                                <span class="settings-item-desc">What should SENTINEL call you?</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="profile.nickname" maxlength="200"
+                                placeholder="e.g. Sooriya" spellcheck="false">
+                        </label>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Full name</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="profile.full_name" maxlength="200"
+                                spellcheck="false">
+                        </label>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Occupation</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="profile.occupation" maxlength="200"
+                                placeholder="e.g. Computer Engineering Undergraduate">
+                        </label>
+                    </div>
+
+                    <h3 class="settings-group-title">Custom instructions</h3>
+                    <div class="settings-group" data-depends="profile.personalization_enabled">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Answer style</span>
+                            </div>
+                            <div class="segmented" data-setting="profile.answer_style" role="radiogroup" aria-label="Answer style">
+                                <button data-value="concise" role="radio">Concise</button>
+                                <button data-value="detailed" role="radio">Detailed</button>
+                            </div>
+                        </div>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">What should SENTINEL know about you?</span>
+                            </span>
+                            <textarea class="text-area" data-setting="profile.about_you" maxlength="1500" rows="4"
+                                placeholder="e.g. I'm a computer engineering student. I mostly use Python and I'm learning FastAPI."></textarea>
+                            <span class="char-count" data-count-for="profile.about_you"></span>
+                        </label>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">How should SENTINEL respond?</span>
+                            </span>
+                            <textarea class="text-area" data-setting="profile.response_style" maxlength="1500" rows="4"
+                                placeholder="e.g. Use bullet points. Explain code step by step. Skip the small talk."></textarea>
+                            <span class="char-count" data-count-for="profile.response_style"></span>
+                        </label>
+                    </div>
+                    <p class="settings-footnote">Changes apply to your next message. The current chat is kept.</p>
+                </section>
+                <section class="settings-view" data-view="model" data-title="Model">
+                    <h3 class="settings-group-title">Provider</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Provider</span>
+                            </div>
+                            <div class="segmented" data-setting="model.provider" role="radiogroup" aria-label="Provider">
+                                <button data-value="ollama" role="radio">Ollama (local)</button>
+                                <button data-value="azure" role="radio" disabled title="Coming soon">Azure</button>
+                            </div>
+                        </div>
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Ollama URL</span>
+                            </span>
+                            <input type="text" class="text-input" data-setting="model.ollama_url" maxlength="200"
+                                placeholder="http://127.0.0.1:11434" spellcheck="false">
+                        </label>
+                    </div>
+
+                    <h3 class="settings-group-title">Model</h3>
+                    <div class="settings-group">
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Model</span>
+                                <span class="settings-item-desc">Models installed in Ollama</span>
+                            </div>
+                            <div class="select-row">
+                                <select class="select-input" data-setting="model.model" aria-label="Model"></select>
+                                <button class="settings-icon-btn outlined" id="refresh-models-btn" title="Refresh model list"
+                                    aria-label="Refresh model list">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 12a9 9 0 1 1-3-6.7L21 8" />
+                                        <path d="M21 3v5h-5" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <span class="settings-status" id="models-status" aria-live="polite"></span>
+                        </div>
+                        <div class="settings-item column">
+                            <button class="settings-btn" id="test-connection-btn">Test connection</button>
+                            <span class="connection-result" id="connection-result" aria-live="polite"></span>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Response</h3>
+                    <div class="settings-group">
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Temperature</span>
+                                <span class="settings-value" data-value-for="model.temperature" data-format="decimal"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Precise</span>
+                                <input type="range" min="0" max="1.5" step="0.1" data-setting="model.temperature"
+                                    aria-label="Temperature">
+                                <span class="slider-end">Creative</span>
+                            </div>
+                        </div>
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Max response length</span>
+                                <span class="settings-value" data-value-for="model.max_tokens" data-format="tokens"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Short</span>
+                                <input type="range" min="128" max="4096" step="128" data-setting="model.max_tokens"
+                                    aria-label="Max response length">
+                                <span class="slider-end">Long</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="settings-footnote">Changes apply to your next message and your next screen capture.</p>
+                </section>
+                <section class="settings-view" data-view="capture" data-title="Capture &amp; Hotkeys">
+                    <h3 class="settings-group-title">Hotkeys</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Capture screen</span>
+                                <span class="settings-item-desc">Select an area to read</span>
+                            </div>
+                            <button class="hotkey-recorder" data-setting="capture.capture_hotkey"
+                                aria-label="Capture screen hotkey. Click to change"></button>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Exit SENTINEL</span>
+                                <span class="settings-item-desc">Close the assistant</span>
+                            </div>
+                            <button class="hotkey-recorder" data-setting="capture.exit_hotkey"
+                                aria-label="Exit hotkey. Click to change"></button>
+                        </div>
+                    </div>
+                    <p class="settings-footnote">Click a shortcut, then press the new key combination. Esc cancels.</p>
+
+                    <h3 class="settings-group-title">Screen reading</h3>
+                    <div class="settings-group">
+                        <label class="settings-item column">
+                            <span class="settings-item-text">
+                                <span class="settings-item-label">Tesseract OCR path</span>
+                            </span>
+                            <span class="select-row">
+                                <input type="text" class="text-input" data-setting="tesseract_cmd" maxlength="500"
+                                    spellcheck="false">
+                                <button class="settings-btn" id="browse-tesseract-btn">Browse…</button>
+                            </span>
+                        </label>
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Copy text to clipboard</span>
+                                <span class="settings-item-desc">Copy what was read after each capture</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="capture.auto_copy"
+                                aria-label="Copy text to clipboard"></button>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Error solutions</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Learn new solutions</span>
+                                <span class="settings-item-desc">Save AI answers for errors SENTINEL hasn't seen before</span>
+                            </div>
+                            <button class="switch" role="switch" data-setting="capture.save_ai_solutions"
+                                aria-label="Learn new solutions"></button>
+                        </div>
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Match sensitivity</span>
+                                <span class="settings-value" data-value-for="capture.match_threshold" data-format="percent"></span>
+                            </div>
+                            <div class="slider-row">
+                                <span class="slider-end">Loose</span>
+                                <input type="range" min="0.4" max="0.9" step="0.05" data-setting="capture.match_threshold"
+                                    aria-label="Match sensitivity">
+                                <span class="slider-end">Strict</span>
+                            </div>
+                            <span class="settings-item-desc">How closely captured text must match a known error before its saved solution is used</span>
+                        </div>
+                    </div>
+                </section>
+                <section class="settings-view" data-view="data" data-title="Data controls">
+                    <h3 class="settings-group-title">Chat</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Clear current chat</span>
+                                <span class="settings-item-desc">Remove all messages in this conversation</span>
+                            </div>
+                            <div class="confirm-action" data-action="clear_chat">
+                                <button class="danger-btn" data-step="ask">Clear</button>
+                                <span class="confirm-buttons">
+                                    <button class="settings-btn small" data-step="cancel">Cancel</button>
+                                    <button class="danger-btn solid" data-step="confirm">Clear</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Error solutions</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Delete learned solutions</span>
+                                <span class="settings-item-desc" id="learned-count">Solutions SENTINEL saved from AI answers</span>
+                            </div>
+                            <div class="confirm-action" data-action="delete_learned">
+                                <button class="danger-btn" data-step="ask">Delete</button>
+                                <span class="confirm-buttons">
+                                    <button class="settings-btn small" data-step="cancel">Cancel</button>
+                                    <button class="danger-btn solid" data-step="confirm">Delete</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Settings</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Reset all settings</span>
+                                <span class="settings-item-desc">Theme, model, hotkeys and capture go back to defaults. Your profile is kept.</span>
+                            </div>
+                            <div class="confirm-action" data-action="reset_settings">
+                                <button class="danger-btn" data-step="ask">Reset</button>
+                                <span class="confirm-buttons">
+                                    <button class="settings-btn small" data-step="cancel">Cancel</button>
+                                    <button class="danger-btn solid" data-step="confirm">Reset</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="settings-footnote">These actions can't be undone.</p>
+                </section>
+
+                <section class="settings-view" data-view="about" data-title="About">
+                    <div class="about-hero">
+                        <div class="about-logo" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z" /><path d="M9 12l2 2 4-4" /></svg>
+                        </div>
+                        <div class="about-name">SENTINEL</div>
+                        <div class="about-sub">AI Smart Assistant · <span id="about-version">v1.0.0</span></div>
+                    </div>
+
+                    <h3 class="settings-group-title">Status</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">AI model</span>
+                                <span class="connection-result" id="about-ollama-status" aria-live="polite"></span>
+                            </div>
+                            <span class="about-value" id="about-model"></span>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Keyboard shortcuts</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <span class="settings-item-label">Capture screen</span>
+                            <span class="hotkey-chips" id="about-capture-hotkey"></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">Exit SENTINEL</span>
+                            <span class="hotkey-chips" id="about-exit-hotkey"></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">Send message</span>
+                            <span class="hotkey-chips"><kbd>Enter</kbd></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">New line</span>
+                            <span class="hotkey-chips"><kbd>Shift</kbd><kbd>Enter</kbd></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">Back / close settings</span>
+                            <span class="hotkey-chips"><kbd>Esc</kbd></span>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Team</h3>
+                    <div class="settings-group">
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">SENTINELS</span>
+                                <span class="settings-item-desc">CO2060 Software Systems Design Project · University of Peradeniya</span>
+                            </div>
+                            <span class="about-team">K.J.V. Kahagalla · K.A.H. Kumarasinghe · P.A.K.N. Sooriyabandara · K.D.N. Chandrasena</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <div class="settings-toast" id="settings-toast" role="status" aria-live="polite"></div>
+        </div>
     </div>
     <script src="renderer.js"></script>
+    <script src="settings.js"></script>
 </body>
 
 </html>

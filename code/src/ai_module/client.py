@@ -3,21 +3,33 @@ import logging
 import json
 import time
 
+from src.settings import load_settings
+
 logger = logging.getLogger(__name__)
 
 class MistralClient:
     """
-    Wrapper for interacting with a local Mistral model API.
-    Assumes Ollama is running at http://localhost:11434.
+    Wrapper for interacting with a local Ollama model API.
+    The URL, model, temperature and max tokens come from settings (config.json)
+    unless passed in explicitly.
     """
 
-    def __init__(self, base_url: str = "http://localhost:11434"):
-        self.base_url = base_url.rstrip("/")
-        self.model = "mistral"
+    def __init__(self, base_url: str = None, model: str = None):
+        model_settings = load_settings()["model"]
+        self.base_url = (base_url or model_settings["ollama_url"]).rstrip("/")
+        self.model = model or model_settings["model"]
+        self.temperature = model_settings["temperature"]
+        self.max_tokens = model_settings["max_tokens"]
 
-    def generate(self, prompt: str, max_tokens: int = 256) -> dict:
+    def _options(self, max_tokens: int = None) -> dict:
+        return {
+            "temperature": self.temperature,
+            "num_predict": max_tokens or self.max_tokens,
+        }
+
+    def generate(self, prompt: str, max_tokens: int = None) -> dict:
         """
-        Send a prompt to the Mistral model and return the response.
+        Send a prompt to the model and return the response.
         Handles Ollama's streaming NDJSON output.
         Retries on 500 errors (model loading).
         """
@@ -29,7 +41,7 @@ class MistralClient:
                     json={
                         "model": self.model,
                         "prompt": prompt,
-                        "options": {"num_predict": max_tokens}
+                        "options": self._options(max_tokens)
                     },
                     stream=True,
                     timeout=120
@@ -86,7 +98,8 @@ class MistralClient:
                 f"{self.base_url}/api/chat",
                 json={
                     "model": self.model,
-                    "messages": messages
+                    "messages": messages,
+                    "options": self._options()
                 },
                 stream=True,
                 timeout=120
@@ -108,3 +121,33 @@ class MistralClient:
         except Exception as e:
             logger.exception("Error in Mistral chat call.")
             return {"error": str(e)}
+
+    def list_models(self) -> dict:
+        """
+        List the models installed in Ollama.
+        Returns {"models": ["mistral:latest", ...], "error": None} or {"models": [], "error": "..."}.
+        """
+        try:
+            response = requests.get(f"{self.base_url}/api/tags", timeout=5)
+            response.raise_for_status()
+            names = [m["name"] for m in response.json().get("models", []) if "name" in m]
+            return {"models": sorted(names), "error": None}
+        except requests.exceptions.ConnectionError:
+            return {"models": [], "error": "Connection error. Make sure Ollama is running."}
+        except Exception as e:
+            return {"models": [], "error": str(e)}
+
+    def ping(self) -> dict:
+        """
+        Check that Ollama is reachable and the selected model is installed.
+        Returns {"ok": bool, "detail": str}.
+        """
+        result = self.list_models()
+        if result["error"]:
+            return {"ok": False, "detail": result["error"]}
+
+        installed = result["models"]
+        names = set(installed) | {name.split(":")[0] for name in installed}
+        if self.model not in names:
+            return {"ok": False, "detail": f"Ollama is running, but model '{self.model}' is not installed. Run: ollama pull {self.model}"}
+        return {"ok": True, "detail": f"Connected to Ollama. Model '{self.model}' is ready."}

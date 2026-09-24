@@ -6,5 +6,8 @@
   "preferred_theme": "dark",
   "answer_style": "concise",
   "favorite_language": "Python",
-  "favorite_colours": ["blue", "black"]
+  "favorite_colours": ["blue", "black"],
+  "personalization_enabled": true,
+  "about_you": "",
+  "response_style": ""
 }
