@@ -88,6 +88,16 @@ class SettingsApiTest(unittest.TestCase):
             self.assertEqual(list(json.load(f)), ["manual error"])
         self.assertEqual(self.control_messages(), [{"action": "settings_updated", "rebuild_index": True}])
 
+    def test_data_stats_counts_learned_solutions(self):
+        self.assertEqual(self.call(action="get_data_stats"), {"action": "data_stats", "total": 0, "learned": 0})
+        with open(rag.DB_FILE, "w", encoding="utf-8") as f:
+            json.dump({
+                "manual error": {"category": "missing_dll", "solution": "fix"},
+                "learned 1": {"category": "AI-generated", "solution": "a"},
+                "learned 2": {"category": "AI-generated", "solution": "b"},
+            }, f)
+        self.assertEqual(self.call(action="get_data_stats"), {"action": "data_stats", "total": 3, "learned": 2})
+
     def test_connection_failure_is_reported(self):
         reply = self.call(action="test_connection", url="http://127.0.0.1:1")
         self.assertEqual(reply["action"], "connection_result")

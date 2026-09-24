@@ -53,6 +53,15 @@ def rebuild_index():
         build_faiss_index()
         print(f"[RAG] Index rebuilt with {_index.ntotal} entries.")
 
+def count_solutions() -> dict:
+    """Return {"total": n, "learned": n} for errors_db.json (learned = AI-generated)."""
+    if not os.path.exists(DB_FILE):
+        return {"total": 0, "learned": 0}
+    with open(DB_FILE, "r", encoding="utf-8") as f:
+        db = json.load(f)
+    learned = sum(1 for v in db.values() if isinstance(v, dict) and v.get("category") == AI_CATEGORY)
+    return {"total": len(db), "learned": learned}
+
 def delete_ai_generated() -> int:
     """Remove every AI-generated entry from errors_db.json. Returns how many were removed."""
     if not os.path.exists(DB_FILE):

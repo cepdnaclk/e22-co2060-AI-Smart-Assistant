@@ -424,10 +424,113 @@
                     </div>
                 </section>
                 <section class="settings-view" data-view="data" data-title="Data controls">
-                    <p class="settings-empty">Data controls are coming soon.</p>
+                    <h3 class="settings-group-title">Chat</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Clear current chat</span>
+                                <span class="settings-item-desc">Remove all messages in this conversation</span>
+                            </div>
+                            <div class="confirm-action" data-action="clear_chat">
+                                <button class="danger-btn" data-step="ask">Clear</button>
+                                <span class="confirm-buttons">
+                                    <button class="settings-btn small" data-step="cancel">Cancel</button>
+                                    <button class="danger-btn solid" data-step="confirm">Clear</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Error solutions</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Delete learned solutions</span>
+                                <span class="settings-item-desc" id="learned-count">Solutions SENTINEL saved from AI answers</span>
+                            </div>
+                            <div class="confirm-action" data-action="delete_learned">
+                                <button class="danger-btn" data-step="ask">Delete</button>
+                                <span class="confirm-buttons">
+                                    <button class="settings-btn small" data-step="cancel">Cancel</button>
+                                    <button class="danger-btn solid" data-step="confirm">Delete</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Settings</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">Reset all settings</span>
+                                <span class="settings-item-desc">Theme, model, hotkeys and capture go back to defaults. Your profile is kept.</span>
+                            </div>
+                            <div class="confirm-action" data-action="reset_settings">
+                                <button class="danger-btn" data-step="ask">Reset</button>
+                                <span class="confirm-buttons">
+                                    <button class="settings-btn small" data-step="cancel">Cancel</button>
+                                    <button class="danger-btn solid" data-step="confirm">Reset</button>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="settings-footnote">These actions can't be undone.</p>
                 </section>
+
                 <section class="settings-view" data-view="about" data-title="About">
-                    <p class="settings-empty">About is coming soon.</p>
+                    <div class="about-hero">
+                        <div class="about-logo" aria-hidden="true">
+                            <svg viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.4 8.7-8 10-4.6-1.3-8-5-8-10V6l8-4z" /><path d="M9 12l2 2 4-4" /></svg>
+                        </div>
+                        <div class="about-name">SENTINEL</div>
+                        <div class="about-sub">AI Smart Assistant · <span id="about-version">v1.0.0</span></div>
+                    </div>
+
+                    <h3 class="settings-group-title">Status</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">AI model</span>
+                                <span class="connection-result" id="about-ollama-status" aria-live="polite"></span>
+                            </div>
+                            <span class="about-value" id="about-model"></span>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Keyboard shortcuts</h3>
+                    <div class="settings-group">
+                        <div class="settings-item">
+                            <span class="settings-item-label">Capture screen</span>
+                            <span class="hotkey-chips" id="about-capture-hotkey"></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">Exit SENTINEL</span>
+                            <span class="hotkey-chips" id="about-exit-hotkey"></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">Send message</span>
+                            <span class="hotkey-chips"><kbd>Enter</kbd></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">New line</span>
+                            <span class="hotkey-chips"><kbd>Shift</kbd><kbd>Enter</kbd></span>
+                        </div>
+                        <div class="settings-item">
+                            <span class="settings-item-label">Back / close settings</span>
+                            <span class="hotkey-chips"><kbd>Esc</kbd></span>
+                        </div>
+                    </div>
+
+                    <h3 class="settings-group-title">Team</h3>
+                    <div class="settings-group">
+                        <div class="settings-item column">
+                            <div class="settings-item-text">
+                                <span class="settings-item-label">SENTINELS</span>
+                                <span class="settings-item-desc">CO2060 Software Systems Design Project · University of Peradeniya</span>
+                            </div>
+                            <span class="about-team">K.J.V. Kahagalla · K.A.H. Kumarasinghe · P.A.K.N. Sooriyabandara · K.D.N. Chandrasena</span>
+                        </div>
+                    </div>
                 </section>
             </div>
 

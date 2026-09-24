@@ -669,13 +669,6 @@ body {
     color: var(--time-color);
 }
 
-.settings-empty {
-    color: var(--muted-color);
-    font-size: 12px;
-    padding: 20px 4px;
-    text-align: center;
-}
-
 /* Section page groups and rows */
 .settings-group-title {
     color: var(--muted-color);
@@ -1063,7 +1056,8 @@ label.settings-item {
     border-color: var(--close-color);
 }
 
-.hotkey-recorder kbd {
+.hotkey-recorder kbd,
+.hotkey-chips kbd {
     padding: 2px 6px;
     background: var(--input-bg);
     border: 1px solid var(--border-color);
@@ -1084,6 +1078,125 @@ label.settings-item {
 .hotkey-hint.error {
     color: var(--close-color);
     animation: none;
+}
+
+.hotkey-chips {
+    display: flex;
+    flex-shrink: 0;
+    gap: 3px;
+}
+
+/* Destructive actions with inline confirmation */
+.confirm-action {
+    display: flex;
+    flex-shrink: 0;
+}
+
+.confirm-buttons {
+    display: none;
+    gap: 6px;
+}
+
+.confirm-action.confirming [data-step="ask"] {
+    display: none;
+}
+
+.confirm-action.confirming .confirm-buttons {
+    display: flex;
+    animation: fade-in 0.15s ease forwards;
+}
+
+.danger-btn {
+    padding: 6px 12px;
+    background: none;
+    border: 1px solid var(--close-color);
+    border-radius: 8px;
+    color: var(--close-color);
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.danger-btn:hover:not(:disabled) {
+    background: var(--close-color);
+    color: var(--on-accent);
+}
+
+.danger-btn.solid {
+    background: var(--close-color);
+    color: var(--on-accent);
+}
+
+.danger-btn:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+.danger-btn:focus-visible {
+    outline: 2px solid var(--close-color);
+    outline-offset: 2px;
+}
+
+.settings-btn.small {
+    padding: 6px 10px;
+    color: var(--text-color);
+}
+
+/* About page */
+.about-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 0 6px;
+    flex-shrink: 0;
+}
+
+.about-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 6px;
+    border-radius: 16px;
+    background: var(--hover-bg);
+    color: var(--accent-color);
+}
+
+.about-logo svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.about-name {
+    color: var(--accent-color);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+}
+
+.about-sub {
+    color: var(--muted-color);
+    font-size: 11px;
+}
+
+.about-value {
+    color: var(--muted-color);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.about-team {
+    color: var(--text-color);
+    font-size: 11px;
+    line-height: 1.6;
 }
 
 /* Status lines */

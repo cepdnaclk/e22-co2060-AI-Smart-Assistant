@@ -8,7 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from src.ai_module.client import MistralClient
 from src.ai_module import client as ai_client  # unpatched client for settings (MistralClient is monkey-patched)
-from src.ai_module.rag import delete_ai_generated
+from src.ai_module.rag import delete_ai_generated, count_solutions
 from src.memory.user_profile import load_profile, save_profile, validate_profile
 from src.settings import load_settings, save_settings, reset_settings
 
@@ -47,7 +47,7 @@ manager = ConnectionManager()
 # -------------------------- Settings API --------------------------
 SETTINGS_ACTIONS = {
     "get_settings", "save_settings", "save_profile", "reset_settings",
-    "list_models", "test_connection", "delete_learned_solutions",
+    "list_models", "test_connection", "delete_learned_solutions", "get_data_stats",
 }
 
 def _notify_main_process(rebuild_index=False):
@@ -120,6 +120,9 @@ def handle_settings_action(request: dict) -> dict:
                 _notify_main_process(rebuild_index=True)
             return {"action": "learned_solutions_deleted", "removed": removed}
 
+        if action == "get_data_stats":
+            return {"action": "data_stats", **count_solutions()}
+
     except Exception as e:
         print(f"Settings action '{action}' failed: {e}")
         return {"action": "settings_error", "errors": {"request": str(e)}}
@@ -174,6 +177,9 @@ async def websocket_endpoint(websocket: WebSocket):
                 # Reply only to the window that asked; don't broadcast
                 loop = asyncio.get_event_loop()
                 reply = await loop.run_in_executor(None, handle_settings_action, request)
+                # Echo request_id so the UI can tell which page asked (e.g. two pages testing the connection)
+                if "request_id" in request:
+                    reply["request_id"] = request["request_id"]
                 await websocket.send_text(json.dumps(reply))
                 continue
 

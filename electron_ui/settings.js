@@ -1,5 +1,6 @@
 // Settings panel: open/close, section navigation, backend sync and toast.
-// Section pages register themselves with settingsUI.registerPage() (later steps).
+// Controls with data-setting="section.key" are bound generically; pages with extra
+// behaviour (Model, Capture, Data controls, About) have their own blocks below.
 (() => {
     const panel = document.getElementById('settings-panel');
     const title = document.getElementById('settings-title');
@@ -12,7 +13,7 @@
     // Replies from the backend that belong to the settings panel
     const REPLY_ACTIONS = new Set([
         'settings', 'settings_saved', 'settings_error',
-        'models', 'connection_result', 'learned_solutions_deleted',
+        'models', 'connection_result', 'learned_solutions_deleted', 'data_stats',
     ]);
 
     const FONT_SIZES = { small: '12px', medium: '13px', large: '15px' };
@@ -532,7 +533,7 @@
 
         testBtn.addEventListener('click', () => {
             commitFocusedField();
-            const request = { url: getSetting('model.ollama_url'), model: getSetting('model.model') };
+            const request = { url: getSetting('model.ollama_url'), model: getSetting('model.model'), request_id: 'model' };
             if (!sendAction('test_connection', request)) {
                 setStatus(testResult, 'Not connected to SENTINEL yet.', 'fail');
                 return;
@@ -556,7 +557,7 @@
             onMessage: (data) => {
                 if (data.action === 'models') {
                     showModels(data.models || [], data.error);
-                } else if (data.action === 'connection_result') {
+                } else if (data.action === 'connection_result' && data.request_id === 'model') {
                     testBtn.disabled = false;
                     testBtn.textContent = 'Test connection';
                     setStatus(testResult, data.detail, data.ok ? 'ok' : 'fail');
@@ -580,6 +581,124 @@
         input.value = file;
         changeSetting('tesseract_cmd', file);
     });
+
+    // -------------------------- Data controls page --------------------------
+    (() => {
+        const CONFIRM_TIMEOUT = 6000;
+        const learnedCount = document.getElementById('learned-count');
+        const deleteBtn = panel.querySelector('[data-action="delete_learned"] [data-step="ask"]');
+        let pendingReset = false;
+
+        // Destructive buttons ask for an inline confirmation first
+        const confirmBoxes = [...panel.querySelectorAll('.confirm-action')];
+        const timers = new Map();
+
+        function setConfirming(box, on) {
+            box.classList.toggle('confirming', on);
+            clearTimeout(timers.get(box));
+            if (on) {
+                timers.set(box, setTimeout(() => setConfirming(box, false), CONFIRM_TIMEOUT));
+                box.querySelector('[data-step="cancel"]').focus();   // safe default
+            }
+        }
+
+        function runAction(action) {
+            let sent;
+            if (action === 'clear_chat') {
+                sent = sendAction('clear_history');
+                if (sent) showToast('✓ Chat cleared');
+            } else if (action === 'delete_learned') {
+                sent = sendAction('delete_learned_solutions');
+            } else if (action === 'reset_settings') {
+                pendingReset = true;
+                sent = sendAction('reset_settings');
+            }
+            if (!sent) {
+                pendingReset = false;
+                showToast('Not connected. Try again in a moment.', 'error');
+            }
+        }
+
+        confirmBoxes.forEach((box) => {
+            const askBtn = box.querySelector('[data-step="ask"]');
+            askBtn.addEventListener('click', () => setConfirming(box, true));
+            box.querySelector('[data-step="cancel"]').addEventListener('click', () => {
+                setConfirming(box, false);
+                askBtn.focus();
+            });
+            box.querySelector('[data-step="confirm"]').addEventListener('click', () => {
+                setConfirming(box, false);
+                runAction(box.dataset.action);
+            });
+        });
+
+        function showStats(total, learned) {
+            learnedCount.textContent = learned
+                ? `${learned} of ${total} saved solutions came from AI answers`
+                : 'No learned solutions saved';
+            deleteBtn.disabled = learned === 0;
+        }
+
+        pages.data = {
+            onShow: () => {
+                confirmBoxes.forEach((box) => setConfirming(box, false));
+                sendAction('get_data_stats');
+            },
+            onMessage: (data) => {
+                if (data.action === 'data_stats') {
+                    showStats(data.total, data.learned);
+                } else if (data.action === 'learned_solutions_deleted') {
+                    showToast(`✓ Deleted ${data.removed} learned solution${data.removed === 1 ? '' : 's'}`);
+                    sendAction('get_data_stats');
+                } else if (data.action === 'settings_saved' && pendingReset) {
+                    pendingReset = false;
+                    showToast('✓ Settings reset to defaults');
+                } else if (data.action === 'settings_error') {
+                    pendingReset = false;
+                }
+            },
+        };
+    })();
+
+    // -------------------------- About page --------------------------
+    (() => {
+        const status = document.getElementById('about-ollama-status');
+        const modelEl = document.getElementById('about-model');
+        const captureChips = document.getElementById('about-capture-hotkey');
+        const exitChips = document.getElementById('about-exit-hotkey');
+
+        try {
+            document.getElementById('about-version').textContent = `v${require('./package.json').version}`;
+        } catch (e) { /* keep the default label */ }
+
+        function showDetails() {
+            if (!state.settings) return;
+            modelEl.textContent = getSetting('model.model');
+            renderHotkey(captureChips, getSetting('capture.capture_hotkey'));
+            renderHotkey(exitChips, getSetting('capture.exit_hotkey'));
+        }
+
+        pages.about = {
+            onShow: () => {
+                showDetails();
+                status.className = 'connection-result';
+                status.textContent = 'Checking Ollama…';
+                if (!sendAction('test_connection', { request_id: 'about' })) {
+                    status.className = 'connection-result fail';
+                    status.textContent = 'Not connected to SENTINEL yet.';
+                }
+            },
+            onSettings: () => {
+                if (currentView === 'about') showDetails();
+            },
+            onMessage: (data) => {
+                if (data.action === 'connection_result' && data.request_id === 'about') {
+                    status.className = `connection-result ${data.ok ? 'ok' : 'fail'}`;
+                    status.textContent = data.ok ? 'Ollama is running' : data.detail;
+                }
+            },
+        };
+    })();
 
     // -------------------------- Public API --------------------------
     window.settingsUI = {
