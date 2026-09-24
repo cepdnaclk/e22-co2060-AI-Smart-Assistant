@@ -1,17 +1,41 @@
 {
-  "name": "electron_ui",
+  "name": "ai-smart-assistant",
   "version": "1.0.0",
-  "description": "",
+  "description": "AI Smart Assistant",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "electron-builder"
   },
-  "keywords": [],
-  "author": "",
+  "author": "SENTINELS",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
-    "electron": "^40.8.0"
+    "electron": "^40.8.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.sentinels.aismartassistant",
+    "productName": "AI Smart Assistant",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": true,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": false,
+      "include": "build/installer.nsh"
+    },
+    "extraResources": [
+      {
+        "from": "../code/dist/main",
+        "to": "backend",
+        "filter": ["**/*"]
+      }
+    ]
   }
 }

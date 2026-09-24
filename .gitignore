@@ -136,3 +136,20 @@ cython_debug/
 
 # Electron local cache (generated at runtime)
 electron_ui/.electron_cache/
+
+# ---------------------------------------------
+# Packaging and Build Folders
+# ---------------------------------------------
+code/build/
+code/dist/
+electron_ui/build/
+electron_ui/dist/
+electron_ui/out/
+
+# Node modules (just in case)
+node_modules/
+electron_ui/node_modules/
+
+# Setup files
+OllamaSetup.exe
+*Setup*.exe
