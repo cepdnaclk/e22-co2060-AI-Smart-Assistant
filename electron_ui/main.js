@@ -46,6 +46,13 @@ function createWindow() {
 }
 
 app.whenReady().then(() => {
+    if (app.isPackaged) {
+        const { spawn } = require('child_process');
+        const backendPath = path.join(process.resourcesPath, 'backend', 'main.exe');
+        if (fs.existsSync(backendPath)) {
+            spawn(backendPath, [], { detached: false });
+        }
+    }
     createWindow();
 
     app.on('activate', () => {

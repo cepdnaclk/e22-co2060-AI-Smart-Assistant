@@ -13,6 +13,8 @@ import queue
 import socket
 from src.ai_module.rag import rag_query, build_faiss_index, cache_suggestion, rebuild_index
 import subprocess
+import urllib.request
+import urllib.error
 
 from src.ocr_module.overlay import RegionSelection
 from src.ocr_module.engine import OCREngine
@@ -238,6 +240,51 @@ def select_chat_port():
         probe.bind(("127.0.0.1", 0))
         return probe.getsockname()[1]
 
+def check_ollama_status(chat_queue):
+    # Wait a moment for UI to fully load
+    time.sleep(2)
+    try:
+        # 1. Check if Ollama is running
+        try:
+            urllib.request.urlopen("http://localhost:11434/", timeout=2)
+        except Exception:
+            if chat_queue:
+                chat_queue.put({"sender": "system", "text": "🔄 **Starting Ollama engine in the background...**"})
+            try:
+                # Attempt to auto-start Ollama quietly
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                subprocess.Popen(["ollama", "serve"], startupinfo=startupinfo)
+                time.sleep(5) # Wait for it to spin up
+                urllib.request.urlopen("http://localhost:11434/", timeout=3)
+            except Exception:
+                if chat_queue:
+                    chat_queue.put({"sender": "system", "text": "⚠️ **Ollama is not installed.**\n\nPlease install it using the provided setup file."})
+                return
+
+        # 2. Check if Mistral is installed
+        try:
+            result = subprocess.run(["ollama", "list"], capture_output=True, text=True, timeout=10)
+            if "mistral" not in result.stdout:
+                if chat_queue:
+                    chat_queue.put({"sender": "system", "text": "⏳ **Downloading AI Brain (Mistral)**...\n\nThis is a one-time 4GB download. It may take a few minutes depending on your internet connection. Please do not close the app!"})
+                
+                # Pull the model
+                pull_result = subprocess.run(["ollama", "pull", "mistral"], capture_output=True, text=True)
+                
+                if pull_result.returncode == 0:
+                    if chat_queue:
+                        chat_queue.put({"sender": "system", "text": "✅ **Download Complete!** The AI is now ready to assist you."})
+                else:
+                    if chat_queue:
+                        chat_queue.put({"sender": "system", "text": f"❌ **Failed to download.**\n```\n{pull_result.stderr}\n```"})
+        except Exception as e:
+            if chat_queue:
+                chat_queue.put({"sender": "system", "text": f"❌ **Error communicating with Ollama:** {e}"})
+    except Exception as e:
+        print(f"Startup check error: {e}")
+
+
 # -------------------------- Main --------------------------
 def main():
     global chat_queue
@@ -260,17 +307,22 @@ def main():
     from src import chatbot_intergrate
     chat_queue, capture_control_queue, chat_process = chatbot_intergrate.start_chat_process()
 
-    # Start Electron UI Subprocess
-    electron_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'electron_ui'))
-    try:
-        electron_process = subprocess.Popen(["cmd.exe", "/c", "npm start"], cwd=electron_dir)
-        print("Electron UI started successfully.")
-    except Exception as e:
-        print(f"Failed to start Electron UI: {e}")
+    # Start Electron UI Subprocess (only in dev mode)
+    import sys
+    if not getattr(sys, 'frozen', False):
+        electron_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..', 'electron_ui'))
+        try:
+            electron_process = subprocess.Popen(["cmd.exe", "/c", "npm start"], cwd=electron_dir)
+            print("Electron UI started successfully.")
+        except Exception as e:
+            print(f"Failed to start Electron UI: {e}")
 
     # Start tray icon thread
     tray_thread = threading.Thread(target=start_tray_icon, daemon=True)
     tray_thread.start()
+
+    # Start Ollama status check in background
+    threading.Thread(target=check_ollama_status, args=(chat_queue,), daemon=True).start()
 
     while running:
         try:
