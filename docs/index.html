@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Smart Assistant — Offline, Privacy-First PC Troubleshooting</title>
+    <meta name="description" content="A 100% offline desktop assistant that reads screen errors with OCR and explains fixes using a local Mistral LLM.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        background: '#09090b',
+                        foreground: '#fafafa',
+                        card: '#18181b',
+                        muted: '#a1a1aa',
+                        primary: '#3b82f6',
+                        border: '#27272a'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #09090b; color: #fafafa; }
+        .glass-nav { background: rgba(9, 9, 11, 0.7); backdrop-filter: blur(12px); border-bottom: 1px solid #27272a; }
+        .gradient-text { background: linear-gradient(to right, #60a5fa, #a78bfa); -webkit-background-clip: text; color: transparent; }
+        .hero-glow { position: absolute; width: 600px; height: 600px; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(9,9,11,0) 70%); top: -200px; left: 50%; transform: translateX(-50%); z-index: -1; }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 30px -10px rgba(59,130,246,0.2); }
+    </style>
+</head>
+<body class="antialiased selection:bg-primary selection:text-white">
+    <div class="hero-glow"></div>
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 glass-nav">
+        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2 font-semibold tracking-tight text-lg">
+                <i data-lucide="cpu" class="w-5 h-5 text-primary"></i>
+                AI Smart Assistant
+            </a>
+            <div class="hidden md:flex gap-8 text-sm font-medium text-muted">
+                <a href="#features" class="hover:text-foreground transition-colors">Features</a>
+                <a href="#architecture" class="hover:text-foreground transition-colors">Architecture</a>
+                <a href="#team" class="hover:text-foreground transition-colors">Team</a>
+            </div>
+            <a href="https://github.com/DanujaNirodhana/AI-Smart-Assistant" target="_blank" class="flex items-center gap-2 text-xs font-medium border border-border px-4 py-2 rounded-full hover:bg-card transition-colors">
+                <i data-lucide="github" class="w-4 h-4"></i> GitHub
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pt-40 pb-20 px-6 text-center max-w-4xl mx-auto">
+        <div class="inline-flex items-center gap-2 border border-border bg-card px-4 py-1.5 rounded-full text-xs font-medium text-muted mb-8">
+            <i data-lucide="wifi-off" class="w-3.5 h-3.5 text-primary"></i> 100% Offline & Privacy-First
+        </div>
+        <h1 class="text-5xl md:text-7xl font-bold tracking-tight leading-tight mb-6">
+            Resolve PC Errors with <br><span class="gradient-text">Local AI Power.</span>
+        </h1>
+        <p class="text-lg text-muted mb-10 max-w-2xl mx-auto">
+            Instantly understand and fix cryptic computer errors using local OCR and Mistral LLM. No cloud. No screenshot uploads. Your data stays yours.
+        </p>
+        <div class="flex items-center justify-center gap-4">
+            <a href="#demo" class="bg-primary text-white px-8 py-3 rounded-full text-sm font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                <i data-lucide="play" class="w-4 h-4"></i> Watch Demo
+            </a>
+            <a href="Project_Progress_Report.pdf" target="_blank" class="border border-border bg-card px-8 py-3 rounded-full text-sm font-medium hover:bg-[#27272a] transition-colors flex items-center gap-2">
+                <i data-lucide="file-text" class="w-4 h-4"></i> Read Report
+            </a>
+        </div>
+    </section>
+
+    <!-- Problem & Solution -->
+    <section class="py-24 px-6 max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
+        <div class="p-10 rounded-3xl border border-border bg-card/50">
+            <p class="text-xs font-bold uppercase tracking-widest text-muted mb-4">The Problem</p>
+            <h2 class="text-2xl font-semibold mb-4">Cryptic errors, leaked screens.</h2>
+            <p class="text-muted leading-relaxed">
+                PC errors are frustrating. Searching Google breaks your workflow. Using ChatGPT means uploading screenshots containing sensitive personal or corporate data to the cloud, posing severe privacy risks.
+            </p>
+        </div>
+        <div class="p-10 rounded-3xl border border-primary/30 bg-primary/5 relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-32 h-32 bg-primary/20 blur-3xl rounded-full"></div>
+            <p class="text-xs font-bold uppercase tracking-widest text-primary mb-4">Our Solution</p>
+            <h2 class="text-2xl font-semibold mb-4">One hotkey. Local answers.</h2>
+            <p class="text-muted leading-relaxed mb-6">
+                Press a hotkey, select the error, and our local Mistral AI streams the solution directly to your screen instantly. Everything runs on your machine.
+            </p>
+            <div class="flex items-center gap-2 text-sm font-medium text-primary">
+                <i data-lucide="shield-check" class="w-4 h-4"></i> 100% Data Privacy
+            </div>
+        </div>
+    </section>
+
+    <!-- Features -->
+    <section id="features" class="py-24 px-6 border-y border-border bg-card/30">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold mb-12">Key Technical Features</h2>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Feature 1 -->
+                <div class="p-8 rounded-2xl border border-border bg-card card-hover">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
+                        <i data-lucide="cpu" class="w-6 h-6 text-primary"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">Local AI Inference</h3>
+                    <p class="text-sm text-muted">Powered by Mistral via Ollama for zero-latency, offline text streaming.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="p-8 rounded-2xl border border-border bg-card card-hover">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center mb-6">
+                        <i data-lucide="scan-text" class="w-6 h-6 text-purple-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">High-Speed OCR</h3>
+                    <p class="text-sm text-muted">Tesseract and Pillow (PIL) preprocessing for accurate screen text extraction.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="p-8 rounded-2xl border border-border bg-card card-hover">
+                    <div class="w-12 h-12 rounded-xl bg-green-500/10 flex items-center justify-center mb-6">
+                        <i data-lucide="database" class="w-6 h-6 text-green-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">Intelligent Caching</h3>
+                    <p class="text-sm text-muted">Custom JSON NoSQL with fuzzy-matching for instant recurring error resolution.</p>
+                </div>
+                <!-- Feature 4 -->
+                <div class="p-8 rounded-2xl border border-border bg-card card-hover">
+                    <div class="w-12 h-12 rounded-xl bg-orange-500/10 flex items-center justify-center mb-6">
+                        <i data-lucide="workflow" class="w-6 h-6 text-orange-400"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-3">Async Architecture</h3>
+                    <p class="text-sm text-muted">Python multiprocessing prevents UI freezing during heavy AI generation.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture -->
+    <section id="architecture" class="py-24 px-6 max-w-6xl mx-auto">
+        <h2 class="text-3xl font-bold mb-10">System Architecture</h2>
+        <div class="rounded-3xl border border-border bg-card p-8 text-center flex flex-col items-center justify-center min-h-[400px]">
+            <i data-lucide="image" class="w-16 h-16 text-muted mb-4"></i>
+            <p class="text-muted">Upload your architecture diagram here (assets/architecture.png)</p>
+        </div>
+        <p class="mt-8 text-muted leading-relaxed max-w-4xl">
+            Our architecture is built on a robust Python multiprocessing foundation. It utilizes an isolated background orchestrator to monitor global hotkeys and capture specific screen regions. The image undergoes contrast enhancement via Pillow before Tesseract OCR processing. Extracted text is routed through a fuzzy-matching sequence algorithm against our JSON NoSQL cache. On cache misses, the query is sent to the local Ollama API, streaming the Mistral LLM's response back to the main frontend asynchronously via IPC Queues.
+        </p>
+    </section>
+
+    <!-- Team -->
+    <section id="team" class="py-24 px-6 border-t border-border bg-card/30">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold mb-4">Meet Team SENTINELS</h2>
+                <p class="text-muted">Department of Computer Engineering, University of Peradeniya</p>
+            </div>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Member 1 -->
+                <div class="p-8 rounded-2xl border border-border bg-card text-center card-hover">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-purple-500 mb-6 flex items-center justify-center">
+                        <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">K.J.V. Kahagalla</h3>
+                    <p class="text-xs text-primary font-medium mb-3">E/22/179</p>
+                    <p class="text-sm text-muted mb-6">UI/UX Engineering & Markdown Rendering</p>
+                    <a href="#" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-background border border-border hover:bg-border transition-colors">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <!-- Member 2 -->
+                <div class="p-8 rounded-2xl border border-border bg-card text-center card-hover">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-purple-500 mb-6 flex items-center justify-center">
+                        <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">K.A.H. Kumarasinghe</h3>
+                    <p class="text-xs text-primary font-medium mb-3">E/22/205</p>
+                    <p class="text-sm text-muted mb-6">OCR & Display Optimization</p>
+                    <a href="#" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-background border border-border hover:bg-border transition-colors">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <!-- Member 3 -->
+                <div class="p-8 rounded-2xl border border-border bg-card text-center card-hover">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-purple-500 mb-6 flex items-center justify-center">
+                        <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">P.A.K.N. Sooriyabandara</h3>
+                    <p class="text-xs text-primary font-medium mb-3">E/22/378</p>
+                    <p class="text-sm text-muted mb-6">AI Integration & Prompt Engineering</p>
+                    <a href="#" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-background border border-border hover:bg-border transition-colors">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                    </a>
+                </div>
+                <!-- Member 4 -->
+                <div class="p-8 rounded-2xl border border-border bg-card text-center card-hover">
+                    <div class="w-20 h-20 mx-auto rounded-full bg-gradient-to-br from-blue-500 to-purple-500 mb-6 flex items-center justify-center">
+                        <i data-lucide="user" class="w-8 h-8 text-white"></i>
+                    </div>
+                    <h3 class="font-bold text-lg">K.D.N. Chandrasena</h3>
+                    <p class="text-xs text-primary font-medium mb-3">E/22/054</p>
+                    <p class="text-sm text-muted mb-6">Deployment, Caching & Architecture</p>
+                    <a href="#" class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-background border border-border hover:bg-border transition-colors">
+                        <i data-lucide="github" class="w-4 h-4"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-10 border-t border-border text-center text-sm text-muted">
+        <p class="mb-2">Developed by Team SENTINELS</p>
+        <p>Department of Computer Engineering, University of Peradeniya — 2026</p>
+    </footer>
+
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+    </script>
+</body>
+</html>
