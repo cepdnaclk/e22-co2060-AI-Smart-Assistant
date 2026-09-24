@@ -13,7 +13,7 @@ if exist dist rmdir /s /q dist
 pip install pyinstaller
 
 :: Compile the main.py into a standalone folder
-pyinstaller --name main --noconfirm --onedir src/main.py
+python -m PyInstaller --name main --noconfirm --onedir src/main.py
 
 echo [2/3] Building Electron UI and Installer...
 cd ../electron_ui
@@ -21,7 +21,11 @@ cd ../electron_ui
 if exist dist rmdir /s /q dist
 
 :: Install electron-builder if missing
-npm install electron-builder --save-dev
+call npm install electron-builder --save-dev
+
+:: Bypass Windows Administrator permission errors for symlinks
+set USE_HARD_LINKS=false
+set CSC_IDENTITY_AUTO_DISCOVERY=false
 
 :: Run electron builder
 call npm run build
