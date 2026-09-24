@@ -1,0 +1,189 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{geometry}
+\geometry{a4paper, left=1.25in, top=1in, bottom=1in, right=0.75in}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{titlesec}
+\usepackage{setspace}
+
+\setstretch{1.5}
+\usepackage{times}
+
+\titleformat{\chapter}[display]
+  {\normalfont\bfseries\Large\centering}{\chaptertitlename\ \thechapter}{10pt}{\Large}
+\titlespacing*{\chapter}{0pt}{-20pt}{20pt}
+
+\begin{document}
+% --- Title Page ---
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    
+    {\Large PROJECT PROGRESS REPORT\par}
+    \vspace{0.5cm}
+    {\Large SOFTWARE SYSTEMS DESIGN PROJECT\par}
+    \vspace{0.5cm}
+    {\Large CO2060\par}
+    
+    \vspace{4cm}
+    
+    {\Large Group No: E22 GR23\par}
+    \vspace{0.5cm}
+    {\Large \textbf{AI SMART ASSISTANT}\par}
+    
+    \vfill
+    
+    {\Large Department of Computer Engineering\par}
+    \vspace{0.5cm}
+    {\Large Faculty of Engineering\par}
+    \vspace{0.5cm}
+    {\Large University of Peradeniya\par}
+    \vspace{0.5cm}
+    {\Large 2026\par}
+\end{titlepage}
+
+% --- Pre-pages ---
+\pagenumbering{roman}
+\newpage
+\section*{Group Details:}
+\textbf{Group No: E22 GR23} \\
+
+\noindent
+\begin{tabularx}{\textwidth}{|c|X|l|X|c|}
+\hline
+No. & Name of the Student & Index Number & E-mail address & Signature \\
+\hline
+1 & K.J.V. Kahagalla & E/22/179 & e22179@eng.pdn.ac.lk & \hspace{1.5cm} \\
+\hline
+2 & K.A.H. Kumarasinghe & E/22/205 & e22205@eng.pdn.ac.lk & \\
+\hline
+3 & P.A.K.N. Sooriyabandara & E/22/378 & e22378@eng.pdn.ac.lk & \\
+\hline
+4 & K.D.N. Chandrasena & E/22/054 & e22054@eng.pdn.ac.lk & \\
+\hline
+\end{tabularx}
+
+
+\newpage
+\tableofcontents
+\newpage
+
+\pagenumbering{arabic}
+% --- Chapter 1: Introduction ---
+\chapter{Introduction}
+
+\section{Project Title}
+AI Smart Assistant
+
+\section{Project Description}
+The AI Smart Assistant is an intelligent, privacy-first desktop software application designed to assist non-technical users in troubleshooting computer errors. It operates entirely offline, utilizing a combination of screen-reading Optical Character Recognition (OCR) and a locally hosted Large Language Model (Mistral via Ollama) to analyze on-screen errors and provide actionable, step-by-step resolution instructions through a custom chat interface.
+
+\section{Background and Motivation}
+Modern operating systems and software applications frequently present cryptic error messages that are difficult for average users to decipher. Typically, resolving these issues requires manual internet searches, navigating forums, or contacting IT support. Our motivation for this project stems from the need to provide instant, accessible troubleshooting directly on the user's screen without compromising their data privacy by sending screen captures to cloud-based AI services.
+
+\section{Problem in Brief}
+The existing system of troubleshooting (manual searching) is slow, frustrating for non-technical users, and often ineffective. Furthermore, relying on modern cloud AI assistants (like ChatGPT or Copilot) introduces significant privacy risks, as users must upload screenshots of their desktop, which may contain sensitive personal or corporate data.
+
+\section{Proposed Solution}
+We propose a lightweight, background-running desktop assistant. Using a global hotkey, the user can draw a bounding box around any error message on their screen. The system uses local OCR (Tesseract) to read the text, queries a local AI model (Ollama/Mistral) for a solution, and displays the fix in a floating chat window ensuring 100\% offline data privacy.
+
+\section{Project Aim and Objectives}
+\textbf{Aim:} To build a fully autonomous, offline AI troubleshooting assistant for Windows. \\
+\textbf{Objectives:}
+\begin{itemize}
+    \item Develop an accurate, high-speed OCR pipeline for screen text extraction.
+    \item Integrate a local LLM API capable of streaming text responses.
+    \item Build a custom, asynchronous graphical user interface (GUI) that does not disrupt the user's workflow.
+    \item Deploy the application as a standalone Windows installer.
+\end{itemize}
+
+\section{Significance of the study}
+Compared to existing systems like Microsoft Copilot, which require constant internet connectivity and upload telemetry/screen data to remote servers, the AI Smart Assistant guarantees absolute data privacy. It empowers average users to fix their own computers instantly without relying on external IT support, reducing downtime and frustration.
+
+% --- Chapter 2: Methodology ---
+\chapter{Methodology}
+
+\section{Introduction}
+The project follows an Agile software development life cycle. Requirements were gathered by interviewing potential end-users (both technical and non-technical) to understand their pain points with computer errors. Development is carried out in iterative sprints, starting with a Minimum Viable Product (MVP) focused on basic OCR-to-AI communication, followed by UI refinement and deployment packaging.
+
+\section{Requirements Identification}
+\subsection{Functional and Non-functional requirements}
+\textbf{Functional Requirements:}
+\begin{itemize}
+    \item The system must capture a user-defined region of the screen via a hotkey.
+    \item The system must extract text from the captured image accurately.
+    \item The system must query an offline LLM and return a troubleshooting solution.
+    \item The system must cache previous solutions to speed up response times.
+\end{itemize}
+\textbf{Non-functional Requirements:}
+\begin{itemize}
+    \item \textbf{Privacy:} All data processing must occur locally (0\% cloud dependency).
+    \item \textbf{Performance:} The OCR extraction must take less than 500ms.
+    \item \textbf{Usability:} The UI must be intuitive and non-intrusive (borderless overlay).
+\end{itemize}
+
+\subsection{User roles}
+The primary user role is the \textbf{End-User}, who interacts with the client interface to resolve PC errors.
+
+\subsection{System requirements (Hardware / Software)}
+\textbf{Software:} Windows 10/11, Python 3.10+, Tesseract OCR Engine, Ollama (Mistral model). \\
+\textbf{Hardware:} Minimum 8GB RAM and a multi-core CPU. A dedicated GPU is recommended for faster LLM inference, though CPU fallback is supported. \\
+\textbf{Justification:} Python was selected for its robust libraries (\texttt{mss}, \texttt{pytesseract}, \texttt{tkinter}). Local Ollama was chosen specifically to satisfy the strict data privacy non-functional requirement.
+
+\section{System Analysis and design}
+(Please refer to Appendix for System Architecture Diagrams). The system utilizes a multi-processing architecture. A background listener process monitors for global hotkeys and manages the OCR/AI pipeline, while a separate process handles the Tkinter GUI rendering to prevent application freezing.
+
+% --- Chapter 3: System Implementation ---
+\chapter{System Implementation and Progress}
+
+\section{Introduction}
+This section outlines the current developmental state of the AI Smart Assistant at the Milestone 3 reporting phase. It highlights the successful integration of the core backend modules with the frontend GUI and the successful deployment packaging.
+
+\section{Current Implementation Status}
+\subsection{Database Realization}
+A custom NoSQL-style JSON database (\texttt{errors\_db.json}) has been successfully implemented. It caches the OCR text and the corresponding AI solution. We integrated a fuzzy-matching algorithm (using Python's \texttt{difflib}) to retrieve cached solutions even if the OCR misreads a single character, significantly improving response times.
+
+\subsection{Backend and Core Logic}
+The core algorithmic components are fully operational. The \texttt{mss} screen capture pipeline is integrated with Tesseract OCR. The image pre-processing pipeline (using PIL/Pillow) has been optimized with contrast enhancements and Lanczos resampling to improve text recognition on high-DPI displays. The API communication with the local Ollama server has been restructured to support chunked streaming responses.
+
+\subsection{Frontend and User Interface}
+A custom, borderless Tkinter user interface has been constructed. It features dynamic text streaming (a "typing" effect), smooth polygon-based chat bubble animations, and an interactive settings panel for hotkey configuration. The UI correctly handles multi-monitor scaling.
+
+\section{Functional Milestones Achieved}
+\begin{itemize}
+    \item \textbf{Requirement 01: Screen Capture \& OCR} - Status: Fully Implemented
+    \item \textbf{Requirement 02: Local AI Integration} - Status: Fully Implemented
+    \item \textbf{Requirement 03: Asynchronous UI} - Status: Fully Implemented
+    \item \textbf{Requirement 04: Windows Installer Deployment} - Status: Fully Implemented
+\end{itemize}
+
+\section{Technical Challenges and Deviations}
+A major technical challenge encountered was integrating the OCR output with the caching database. Initially, the logic required a 100\% exact text match, which failed frequently due to minor OCR typos (e.g., misreading 'O' as '0'). To mitigate this without compromising the core project scope, we adapted the workflow by implementing a fuzzy-matching sequence algorithm, which successfully resolves minor typos dynamically.
+
+% --- Chapter 4: Project Plan ---
+\chapter{Project Plan}
+
+\section{Project Plan}
+The initial sprints focused on establishing the OCR and AI pipeline (MVP). Mid-semester efforts were reallocated towards system deployment, specifically engineering a standalone Windows Installer using Inno Setup to ensure all dependencies (Python, Tesseract) are bundled. The final sprints will focus on UI markdown rendering and final User Acceptance Testing.
+
+\section{Individual contribution}
+The workload was divided as follows:
+\begin{itemize}
+    \item \textbf{K.J.V. Kahagalla:} UI/UX Engineering (Tkinter redesign, streaming text frontend, animations).
+    \item \textbf{K.A.H. Kumarasinghe:} OCR \& Display Optimization (multi-monitor support, high-DPI fixes, image pre-processing).
+    \item \textbf{P.A.K.N. Sooriyabandara:} AI Integration (Ollama streaming API, prompt engineering, output formatting).
+    \item \textbf{K.D.N. Chandrasena:} Deployment \& Architecture (Inno Setup Windows Installer, fuzzy-matching database caching).
+\end{itemize}
+
+\section{Future Work}
+\begin{itemize}
+    \item \textbf{K.J.V. Kahagalla:} Integrate a full markdown rendering engine within the Tkinter chat window.
+    \item \textbf{K.A.H. Kumarasinghe:} Conduct performance profiling on Tesseract to further reduce latency.
+    \item \textbf{P.A.K.N. Sooriyabandara:} Implement fallback mechanisms for slower hardware (e.g., swapping to a smaller LLM model dynamically).
+    \item \textbf{K.D.N. Chandrasena:} Conduct installation testing on clean virtual machines and finalize system documentation.
+\end{itemize}
+
+\end{document}
