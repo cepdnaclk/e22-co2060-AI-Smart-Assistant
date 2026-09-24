@@ -2,6 +2,25 @@ const { app, BrowserWindow } = require('electron');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
+const net = require('net');
+
+function getFreePort() {
+    return new Promise((resolve, reject) => {
+        const srv = net.createServer(function(sock) {
+            sock.end('Hello world\n');
+        });
+        srv.listen(0, function() {
+            const port = srv.address().port;
+            srv.close((err) => {
+                if (err) reject(err);
+                else resolve(port);
+            });
+        });
+        srv.on('error', function(err) {
+            reject(err);
+        });
+    });
+}
 
 // Redirect user data to a temporary folder so locked cache files don't break restarts
 const tempUserDataPath = path.join(os.tmpdir(), 'electron_ui_' + Date.now());
@@ -45,12 +64,30 @@ function createWindow() {
     win.loadFile('index.html');
 }
 
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
     if (app.isPackaged) {
-        const { spawn } = require('child_process');
-        const backendPath = path.join(process.resourcesPath, 'backend', 'main.exe');
-        if (fs.existsSync(backendPath)) {
-            spawn(backendPath, [], { detached: false });
+        try {
+            const port = await getFreePort();
+            process.env.CHAT_SERVER_PORT = port;
+            const { spawn } = require('child_process');
+            const backendPath = path.join(process.resourcesPath, 'backend', 'main.exe');
+            if (fs.existsSync(backendPath)) {
+                const backendProcess = spawn(backendPath, [], { 
+                    detached: false,
+                    env: { ...process.env, CHAT_SERVER_PORT: port, PYTHONIOENCODING: "utf8" }
+                });
+                app.on('will-quit', () => {
+                    if (backendProcess) {
+                        try {
+                            backendProcess.kill();
+                            const { exec } = require('child_process');
+                            exec(`taskkill /F /PID ${backendProcess.pid} /T`);
+                        } catch (e) {}
+                    }
+                });
+            }
+        } catch (err) {
+            console.error("Failed to get free port:", err);
         }
     }
     createWindow();

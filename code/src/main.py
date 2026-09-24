@@ -71,13 +71,13 @@ def find_error_solution(text: str, threshold: float = 0.6):
     print("Normalized OCR:", normalized)
     for key, value in db.items():
         if key in normalized:
-            print(f"✅ Exact match: {key}")
+            print(f"[MATCH] Exact match: {key}")
             return value
         ratio = difflib.SequenceMatcher(None, key, normalized).ratio()
         if ratio > threshold:
-            print(f"🤏 Fuzzy match: {key} (score {ratio:.2f})")
+            print(f"[MATCH] Fuzzy match: {key} (score {ratio:.2f})")
             return value
-    print("❌ No match found")
+    print("[MATCH] No match found")
     return None
 
 # -------------------------- Tray Icon --------------------------
@@ -142,7 +142,8 @@ def run_capture_logic():
             copy_to_clipboard(text)
 
         if chat_queue:
-            chat_queue.put({"sender": "system", "text": f"OCR Input: {text}", "role": "user"})
+            chat_queue.put({"sender": "user", "text": f"OCR Input: {text}", "role": "user"})
+            chat_queue.put({"action": "thinking"})
 
         # --- DB + RAG logic ---
         solution = find_error_solution(text, capture_settings["match_threshold"])
@@ -183,6 +184,8 @@ def run_capture_logic():
 
     except Exception as e:
         print(f"Error in capture logic: {e}")
+        if chat_queue:
+            chat_queue.put({"sender": "system", "text": f"⚠️ An internal error occurred during analysis:\n```\n{e}\n```"})
     finally:
         is_processing = False
 
@@ -300,7 +303,8 @@ def main():
     print("[RAG] FAISS index building in background...")
 
     # Pick a free port so an orphaned previous server cannot block startup.
-    os.environ["CHAT_SERVER_PORT"] = str(select_chat_port())
+    if "CHAT_SERVER_PORT" not in os.environ:
+        os.environ["CHAT_SERVER_PORT"] = str(select_chat_port())
     print(f"Chat server port: {os.environ['CHAT_SERVER_PORT']}")
 
     # Start chat UI process (FastAPI server)
@@ -360,4 +364,6 @@ def main():
 
 
 if __name__ == "__main__":
+    import multiprocessing
+    multiprocessing.freeze_support()
     main()

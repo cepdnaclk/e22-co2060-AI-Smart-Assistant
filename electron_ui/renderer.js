@@ -51,12 +51,14 @@ function connectWebSocket() {
                     ipcRenderer.send('hide-window');
                 } else if (data.action === 'quit') {
                     window.close();
-                    } else if (data.action === 'clear') {
-                        chatHistory.innerHTML = '';
-                        updateEmptyState();
-                    } else if (data.action === 'remove_last_assistant') {
-                        const messages = chatHistory.querySelectorAll('.message-row.system:not(#thinking-row)');
-                        if (messages.length) messages[messages.length - 1].remove();
+                } else if (data.action === 'clear') {
+                    chatHistory.innerHTML = '';
+                    updateEmptyState();
+                } else if (data.action === 'thinking') {
+                    showThinking();
+                } else if (data.action === 'remove_last_assistant') {
+                    const messages = chatHistory.querySelectorAll('.message-row.system:not(#thinking-row)');
+                    if (messages.length) messages[messages.length - 1].remove();
                 }
                 return;
             }
