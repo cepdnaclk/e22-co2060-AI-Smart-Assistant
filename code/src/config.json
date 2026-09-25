@@ -1,7 +1,28 @@
 {
     "tesseract_cmd": "C:\\Program Files\\Tesseract-OCR\\tesseract.exe",
     "serial_port": "COM3",
-    "baud_rate": 9600
+    "baud_rate": 9600,
+    "general": {
+        "theme": "dark",
+        "font_size": "medium",
+        "offline_mode": false,
+        "typing_animation": true,
+        "typing_speed": 18,
+        "always_on_top": true,
+        "window_opacity": 0.8
+    },
+    "model": {
+        "provider": "ollama",
+        "ollama_url": "http://127.0.0.1:11434",
+        "model": "mistral",
+        "temperature": 0.7,
+        "max_tokens": 512
+    },
+    "capture": {
+        "capture_hotkey": "ctrl+alt+shift+o",
+        "exit_hotkey": "ctrl+alt+shift+p",
+        "auto_copy": true,
+        "save_ai_solutions": true,
+        "match_threshold": 0.6
+    }
 }
-
-

@@ -12,6 +12,7 @@ DEFAULTS = {
     "general": {
         "theme": "dark",
         "font_size": "medium",
+        "offline_mode": False,
         "typing_animation": True,
         "typing_speed": 18,
         "always_on_top": True,
@@ -95,6 +96,7 @@ RULES = {
     "general": {
         "theme": _choice("dark", "light", "system"),
         "font_size": _choice("small", "medium", "large"),
+        "offline_mode": _boolean,
         "typing_animation": _boolean,
         "typing_speed": _number(5, 60, integer=True),
         "always_on_top": _boolean,

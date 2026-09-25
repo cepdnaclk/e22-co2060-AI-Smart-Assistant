@@ -142,11 +142,8 @@ async def websocket_endpoint(websocket: WebSocket):
 
     async def generate_reply(prompt):
         def call_mistral(message):
-            client = MistralClient()
-            result = client.generate(
-                f"You are a helpful AI assistant.\nUser: {message}\nAssistant:"
-            )
-            return result.get("response") or "AI unavailable. Make sure Ollama is running (ollama run mistral)."
+            from src.chatbot_intergrate import chatbot
+            return chatbot.continue_conversation(message)
 
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, call_mistral, prompt)
@@ -199,6 +196,8 @@ async def websocket_endpoint(websocket: WebSocket):
                 if not prompt:
                     continue
                 if chatbot.history and chatbot.history[-1]["role"] == "assistant":
+                    chatbot.history.pop()
+                if chatbot.history and chatbot.history[-1]["role"] == "user":
                     chatbot.history.pop()
                 await manager.broadcast({"action": "remove_last_assistant"})
                 ai_reply = await generate_reply(prompt)

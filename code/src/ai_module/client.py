@@ -15,8 +15,11 @@ class MistralClient:
     """
 
     def __init__(self, base_url: str = None, model: str = None):
-        model_settings = load_settings()["model"]
+        settings = load_settings()
+        model_settings = settings["model"]
         self.base_url = (base_url or model_settings["ollama_url"]).rstrip("/")
+        if settings["general"].get("offline_mode"):
+            self.base_url = "http://127.0.0.1:11434"
         self.model = model or model_settings["model"]
         self.temperature = model_settings["temperature"]
         self.max_tokens = model_settings["max_tokens"]

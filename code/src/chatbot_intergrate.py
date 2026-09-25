@@ -1,6 +1,7 @@
 import multiprocessing
 import src.chat_ui as chat_ui
 from src.ai_module.client import MistralClient
+from src.ai_module.router import handle_user_query
 from src.memory.user_profile import load_profile, PROFILE_DEFAULTS
 
 ANSWER_STYLES = {
@@ -80,10 +81,9 @@ class ChatbotIntegration:
         self.history.append({"role": "user", "content": user_message})
 
         # New client per message so model settings changes apply immediately
-        result = MistralClient().chat(self.history)
-        response_text = result.get("response")
+        response_text = handle_user_query(user_message, self.history)
         if not response_text:
-            err_msg = result.get("error", "Unknown error")
+            err_msg = "Unknown error"
             response_text = (
                 f"⚠️ AI unavailable: {err_msg}. "
                 f"Make sure Ollama is running (`ollama run mistral`)."
