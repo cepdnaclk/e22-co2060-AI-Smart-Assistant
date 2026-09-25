@@ -4,7 +4,8 @@ import threading
 import numpy as np
 from src.ai_module.client import MistralClient
 
-DB_FILE = os.path.join(os.path.dirname(__file__), "..", "errors_db.json")
+from src.settings import get_app_data_dir
+DB_FILE = os.path.join(get_app_data_dir(), "errors_db.json")
 AI_CATEGORY = "AI-generated"
 
 # Lazy-loaded globals — only initialized on first use

@@ -1,7 +1,8 @@
 import json
 import os
 
-DB_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'errors_db.json')
+from src.settings import get_app_data_dir
+DB_FILE = os.path.join(get_app_data_dir(), 'errors_db.json')
 
 
 def normalize_text(text: str) -> str:

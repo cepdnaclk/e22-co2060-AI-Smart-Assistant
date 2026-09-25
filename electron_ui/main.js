@@ -63,7 +63,7 @@ function createWindow() {
         }
     });
 
-    win.loadFile('index.html');
+    win.loadFile('index.html', { query: { port: process.env.CHAT_SERVER_PORT || '8000' } });
 }
 
 app.whenReady().then(async () => {

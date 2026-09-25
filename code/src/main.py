@@ -30,7 +30,8 @@ except Exception:
     ctypes.windll.user32.SetProcessDPIAware()
 
 # -------------------------- Config Paths --------------------------
-DB_FILE = os.path.join(os.path.dirname(__file__), 'errors_db.json')
+from src.settings import get_app_data_dir
+DB_FILE = os.path.join(get_app_data_dir(), 'errors_db.json')
 
 import sys
 from dotenv import load_dotenv

@@ -3,7 +3,34 @@ import json
 import os
 import re
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), 'config.json')
+import sys
+
+def get_app_data_dir():
+    app_name = "AI-Smart-Assistant"
+    if sys.platform == "win32":
+        base_path = os.environ.get("APPDATA", os.path.expanduser("~"))
+    else:
+        base_path = os.path.expanduser("~")
+    app_dir = os.path.join(base_path, app_name)
+    os.makedirs(app_dir, exist_ok=True)
+    
+    # Initialize DB if missing
+    db_dest = os.path.join(app_dir, 'errors_db.json')
+    if not os.path.exists(db_dest):
+        try:
+            import shutil
+            if getattr(sys, 'frozen', False):
+                bundled_db = os.path.join(sys._MEIPASS, 'errors_db.json')
+            else:
+                bundled_db = os.path.join(os.path.dirname(__file__), '..', 'errors_db.json')
+            if os.path.exists(bundled_db):
+                shutil.copy2(bundled_db, db_dest)
+        except Exception as e:
+            print("Could not copy initial db:", e)
+            
+    return app_dir
+
+CONFIG_PATH = os.path.join(get_app_data_dir(), 'config.json')
 
 DEFAULTS = {
     "tesseract_cmd": r"C:\Program Files\Tesseract-OCR\tesseract.exe",

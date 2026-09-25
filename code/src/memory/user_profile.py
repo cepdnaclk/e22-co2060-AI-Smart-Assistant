@@ -1,7 +1,8 @@
 import json
 import os
 
-PROFILE_FILE = os.path.join(os.path.dirname(__file__), "user_profile.json")
+from src.settings import get_app_data_dir
+PROFILE_FILE = os.path.join(get_app_data_dir(), "user_profile.json")
 
 # Settings-style keys that control personalization (not facts about the user)
 PROFILE_DEFAULTS = {

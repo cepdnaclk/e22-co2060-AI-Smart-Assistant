@@ -22,7 +22,8 @@ let reconnectTimer = null;
 let isConnected = false;
 
 function connectWebSocket() {
-    const chatPort = process.env.CHAT_SERVER_PORT || '8000';
+    const urlParams = new URLSearchParams(window.location.search);
+    const chatPort = urlParams.get('port') || process.env.CHAT_SERVER_PORT || '8000';
     ws = new WebSocket(`ws://127.0.0.1:${chatPort}/ws`);
 
     ws.onopen = () => {
