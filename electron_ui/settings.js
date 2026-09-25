@@ -49,6 +49,7 @@
         root.dataset.theme = theme;
         root.style.setProperty('--chat-font-size', FONT_SIZES[general.font_size] || FONT_SIZES.medium);
         root.style.setProperty('--window-alpha', general.window_opacity);
+        root.classList.toggle('offline-mode', !!general.offline_mode);
         ipcRenderer.send('set-always-on-top', general.always_on_top);
     }
 

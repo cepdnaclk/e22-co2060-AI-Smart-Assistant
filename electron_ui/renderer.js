@@ -249,6 +249,8 @@ function regenerateLastResponse() {
     if (sendAction('regenerate')) showThinking();
 }
 
+let thinkingTimeout = null;
+
 function showThinking() {
     removeThinking(); // Clear any existing one first
 
@@ -267,6 +269,10 @@ function showThinking() {
 }
 
 function removeThinking() {
+    if (thinkingTimeout) {
+        clearTimeout(thinkingTimeout);
+        thinkingTimeout = null;
+    }
     if (thinkingBubble) {
         thinkingBubble.remove();
         thinkingBubble = null;
@@ -281,7 +287,7 @@ function sendMessage() {
         chatInput.focus();
         // Show "Thinking..." after user sends a message
         // Small delay so the user message appears first
-        setTimeout(showThinking, 100);
+        thinkingTimeout = setTimeout(showThinking, 100);
     } else if (text) {
         addMessage('Chat service is still connecting. Please try again in a moment.', 'system');
     }

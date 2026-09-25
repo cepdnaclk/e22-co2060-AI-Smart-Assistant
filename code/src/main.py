@@ -32,6 +32,16 @@ except Exception:
 # -------------------------- Config Paths --------------------------
 DB_FILE = os.path.join(os.path.dirname(__file__), 'errors_db.json')
 
+import sys
+from dotenv import load_dotenv
+
+if getattr(sys, 'frozen', False):
+    env_path = os.path.join(sys._MEIPASS, '.env')
+else:
+    env_path = os.path.join(os.path.dirname(__file__), '.env')
+
+load_dotenv(dotenv_path=env_path)
+
 settings = load_settings()
 TESSERACT_CMD = settings["tesseract_cmd"]
 

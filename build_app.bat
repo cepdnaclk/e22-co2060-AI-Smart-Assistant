@@ -9,11 +9,12 @@ cd code
 if exist build rmdir /s /q build
 if exist dist rmdir /s /q dist
 
-:: Install PyInstaller if missing
+:: Install dependencies
 pip install pyinstaller
+pip install -r requirements.txt
 
 :: Compile the main.py into a standalone folder
-python -m PyInstaller --name main --noconfirm --onedir --add-data "src/errors_db.json;." --collect-all scipy --collect-all nltk --collect-all llama_index --collect-all sentence_transformers --collect-all faiss src/main.py
+python -m PyInstaller --name main --noconfirm --onedir --add-data "src/errors_db.json;." --add-data "src/.env;." --collect-all scipy --collect-all nltk --collect-all llama_index --collect-all sentence_transformers --collect-all faiss src/main.py
 
 echo [2/3] Building Electron UI and Installer...
 cd ../electron_ui

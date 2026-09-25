@@ -53,6 +53,8 @@ function createWindow() {
         y: height - winHeight - 20,
         frame: false,
         transparent: true,
+        thickFrame: false,
+        hasShadow: false,
         alwaysOnTop: true,
         show: true,
         webPreferences: {
